@@ -1,3 +1,4 @@
+(require 'org)
 (let* ((org-file (expand-file-name "config.org" user-emacs-directory))
        (el-file "~/.cache/emacs/config.el"))
   ;; Ensure cache directory exists

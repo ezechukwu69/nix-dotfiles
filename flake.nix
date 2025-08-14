@@ -12,9 +12,14 @@
       # to avoid problems caused by different versions of nixpkgs.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zen-browser = { 
+	    url = "github:0xc000022070/zen-browser-flake";
+	    inputs.nixpkgs.follows = "nixpkgs";
+	    inputs.home-manager.follows = "home-manager";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
+  outputs = inputs@{ self, nixpkgs, home-manager, ... }: {
 	nixosConfigurations.stemzzz = nixpkgs.lib.nixosSystem {
 		modules = [ 
 			./configuration.nix 
@@ -23,6 +28,7 @@
 				home-manager.useGlobalPkgs = true;
 				home-manager.useUserPackages = true;
 				home-manager.backupFileExtension = "backup";
+				home-manager.extraSpecialArgs = { inherit inputs; };
 				home-manager.users.ezechukwu69 = import ./home.nix;
 			}
 		];

@@ -1,0 +1,27 @@
+{
+  "bar.customModules.storage.paths": [
+    "/"
+  ],
+  "theme.font.name": "Aporetic Serif",
+  "theme.font.style": "normal",
+  "theme.font.label": "Aporetic Serif Bold",
+  "theme.font.size": "0.9rem",
+  "theme.bar.menus.monochrome": false,
+  "wallpaper.pywal": false,
+  "theme.bar.transparent": true,
+  "theme.matugen": true,
+  "theme.osd.orientation": "vertical",
+  "menus.volume.raiseMaximumVolume": true,
+  "menus.power.showLabel": true,
+  "bar.customModules.storage.pollingInterval": 2000,
+  "bar.customModules.storage.tooltipStyle": "percentage-bar",
+  "menus.dashboard.directories.left.directory1.label": "󰉍  Downloads",
+  "menus.dashboard.directories.left.directory2.label": "󰉏  Videos",
+  "menus.dashboard.directories.left.directory3.label": "󰚝  Projects",
+  "menus.dashboard.directories.right.directory1.label": "󱧶  Documents",
+  "menus.dashboard.directories.right.directory2.label": "󰉏  Pictures",
+  "menus.dashboard.directories.right.directory3.label": "󱂵  Home",
+  "menus.dashboard.stats.interval": 2000,
+  "menus.dashboard.shortcuts.left.shortcut1.command": "zen",
+  "wallpaper.image": "/home/ezechukwu69/Wallpapers/astronaut.png"
+}

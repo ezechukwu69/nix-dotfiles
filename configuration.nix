@@ -46,18 +46,19 @@
   time.timeZone = "Africa/Lagos";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_NG";
+  i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_NG";
-    LC_IDENTIFICATION = "en_NG";
-    LC_MEASUREMENT = "en_NG";
-    LC_MONETARY = "en_NG";
-    LC_NAME = "en_NG";
-    LC_NUMERIC = "en_NG";
-    LC_PAPER = "en_NG";
-    LC_TELEPHONE = "en_NG";
-    LC_TIME = "en_NG";
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_ALL = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
   };
 
   # Enable the X11 windowing system.
@@ -65,6 +66,7 @@
 
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.wayland = true;
   services.xserver.desktopManager.gnome.enable = true;
 
   services.udev.extraRules = ''
@@ -139,6 +141,16 @@
     kanata
     matugen
     hypridle
+    hyprcursor
+    hyprshot
+    hyprpanel
+    hyprsunset
+    hyprpicker
+    hyprpolkitagent
+    waybar
+    killall
+    libnotify
+    mako
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -150,6 +162,8 @@
   # };
 
   environment.etc."kanata/kanata.kbd".source = ./dotfiles/kanata/config.kbd;
+
+  services.flatpak.enable = true;
 
   services.hypridle = {
 	enable = true;
