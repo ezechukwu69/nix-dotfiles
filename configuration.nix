@@ -3,7 +3,6 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -118,6 +117,17 @@
  
   programs.zsh.enable = true;
 
+  programs.hyprland = {
+ 	enable = true;
+	xwayland = {
+		enable = true;
+	};
+  };
+
+  programs.hyprlock = {
+	enable = true;
+  };
+
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -127,6 +137,8 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     kanata
+    matugen
+    hypridle
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -137,7 +149,11 @@
   #   enableSSHSupport = true;
   # };
 
-  environment.etc."kanata/kanata.kbd".source = ./dotfiles/kanata/kanata.kbd;
+  environment.etc."kanata/kanata.kbd".source = ./dotfiles/kanata/config.kbd;
+
+  services.hypridle = {
+	enable = true;
+  };
 
   services.kanata = {
 	  enable = true;

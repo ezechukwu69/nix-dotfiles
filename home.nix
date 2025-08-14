@@ -6,11 +6,15 @@
 
 	xdg.configFile."emacs".source = ./dotfiles/emacs;
 	xdg.configFile."kanata".source = ./dotfiles/kanata;
+	xdg.configFile."hypr".source = ./dotfiles/hypr;
+	xdg.configFile."waybar".source = ./dotfiles/waybar;
+	xdg.configFile."matugen".source = ./dotfiles/matugen;
 	#home.file.".emacs.d".source = ./dotfiles/emacs;
 
 	home.packages = with pkgs; [
 		btop
  		ripgrep
+		tree
 		neofetch
 		zip
 		unzip
