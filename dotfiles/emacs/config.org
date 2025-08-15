@@ -840,396 +840,406 @@ Essential emacs defaults
 * GENERAL (Keybindings)
 
 #+begin_src emacs-lisp
-  (defun move-text-up ()
-    "Move current line or region up."
+(defun move-text-up ()
+  "Move current line or region up."
+  (interactive)
+  (if (region-active-p)
+      (let ((text (buffer-substring (region-beginning) (region-end))))
+    	(delete-region (region-beginning) (region-end))
+    	(forward-line -1)
+    	(insert text))
+    (let ((col (current-column)))
+      (transpose-lines 1)
+      (forward-line -2)
+      (move-to-column col))))
+
+(defun move-text-down ()
+  "Move current line or region down."
+  (interactive)
+  (if (region-active-p)
+      (let ((text (buffer-substring (region-beginning) (region-end))))
+    	(delete-region (region-beginning) (region-end))
+    	(forward-line 1)
+    	(insert text))
+    (let ((col (current-column)))
+      (forward-line 1)
+      (transpose-lines 1)
+      (forward-line -1)
+      (move-to-column col))))
+
+
+(defun my/switch-to-previous-buffer ()
+  "Switch to the previous buffer."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+(global-set-key (kbd "M-]") 'next-buffer)
+(global-set-key (kbd "M-[") 'previous-buffer)
+(global-set-key (kbd "C-^") 'my/switch-to-previous-buffer)
+
+
+(use-package general
+  :ensure t
+  :after evil				
+  :config
+  (general-auto-unbind-keys)
+  (general-evil-setup t)
+
+  ;; Set leader key
+  (general-create-definer my/leader-keys
+    ;; :keymaps 'evil-normal-state-map
+    :prefix "C-c"
+    :global-prefix "C-c"
+    :non-normal-prefix "C-c") ;; Optional: a global prefix for non-evil modes
+
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "<SPC>"
+    "a" '(:ignore t :which-key "AI")
+    "a a" '(gptel :which-key "Gptel")
+    "a m" '(gptel-menu :which-key "Gptel Menu")
+    )
+
+  (defun toggle-evil-mode ()
+    "Toggle evil mode between enabled and disabled"
     (interactive)
-    (if (region-active-p)
-        (let ((text (buffer-substring (region-beginning) (region-end))))
-    	    (delete-region (region-beginning) (region-end))
-    	    (forward-line -1)
-    	    (insert text))
-      (let ((col (current-column)))
-        (transpose-lines 1)
-        (forward-line -2)
-        (move-to-column col))))
+    (if evil-mode
+        (evil-mode -1)
+      (evil-mode 1)))
 
-  (defun move-text-down ()
-    "Move current line or region down."
-    (interactive)
-    (if (region-active-p)
-        (let ((text (buffer-substring (region-beginning) (region-end))))
-    	    (delete-region (region-beginning) (region-end))
-    	    (forward-line 1)
-    	    (insert text))
-      (let ((col (current-column)))
-        (forward-line 1)
-        (transpose-lines 1)
-        (forward-line -1)
-        (move-to-column col))))
+  
+  (my/leader-keys
+    ;; :states '(normal visual motion emacs)
+    ;; :prefix "<SPC>"
+    "d" '(:ignore t :which-key "Debugger")
+    "d i" #'dape-info
+    "d d" #'dape
+    "d n" #'dape-next
+    "d r" #'dape-restart
+    "d R" #'dape-repl
+    "d c" #'dape-continue
+    "d o" #'dape-step-out
+    "d s" #'dape-step-in
+    "d q" #'dape-quit
+    "d p" #'dape-pause
+    "d w" #'dape-watch-dwim
+    "d b" #'dape-breakpoint-toggle
+    "d B" #'dape-breakpoint-remove-all
+    "d e" #'dape-breakpoint-expression
+    "d x" #'dape-evaluate-expression
+    )
 
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "<SPC>"
+    "d" '(:ignore t :which-key "Debugger")
+    "d i" #'dape-info
+    "d d" #'dape
+    "d n" #'dape-next
+    "d r" #'dape-restart
+    "d R" #'dape-repl
+    "d c" #'dape-continue
+    "d o" #'dape-step-out
+    "d s" #'dape-step-in
+    "d q" #'dape-quit
+    "d p" #'dape-pause
+    "d w" #'dape-watch-dwim
+    "d b" #'dape-breakpoint-toggle
+    "d B" #'dape-breakpoint-remove-all
+    "d e" #'dape-breakpoint-expression
+    "d x" #'dape-evaluate-expression
+    )
 
-  (defun my/switch-to-previous-buffer ()
-    "Switch to the previous buffer."
-    (interactive)
-    (switch-to-buffer (other-buffer (current-buffer) 1)))
+  (general-define-key
+   :states '(normal visual)
+   :prefix "]"
+   "b" 'next-buffer
+   "B" 'end-of-buffer
+   "e" 'move-text-down
+   ;; "f" 'next-file
+   "l" 'next-error
+   "L" 'flycheck-next-error
+   "q" 'flymake-goto-next-error
+   "Q" 'flycheck-next-error
+   ;; "s" 'flyspell-goto-next-error
+   "t" 'tab-next
+   "T" 'tab-move-right
+   "w" 'next-multiframe-window
+   "n" 'git-gutter:next-hunk
+   "c" 'diff-hl-next-hunk
+   "p" 'git-gutter:next-hunk
+   "m" 'flymake-goto-next-error
+   "d" 'lsp-ui-flycheck-list
+   "a" 'forward-list
+   "x" 'toggle-truncate-lines)
 
-  (global-set-key (kbd "M-]") 'next-buffer)
-  (global-set-key (kbd "M-[") 'previous-buffer)
-  (global-set-key (kbd "C-^") 'my/switch-to-previous-buffer)
+  
+  (general-define-key
+   :states '(normal visual)
+   :prefix "["
+   "b" 'previous-buffer
+   "B" 'end-of-buffer
+   "e" 'move-text-down
+   ;; "f" 'previous-file
+   "l" 'previous-error
+   "L" 'flycheck-previous-error
+   "q" 'flymake-goto-previous-error
+   "Q" 'flycheck-previous-error
+   ;; "s" 'flyspell-goto-previous-error
+   "t" 'tab-previous
+   "T" 'tab-move-right
+   "w" 'previous-multiframe-window
+   "n" 'git-gutter:previous-hunk
+   "c" 'diff-hl-previous-hunk
+   "p" 'git-gutter:previous-hunk
+   "m" 'flymake-goto-previous-error
+   "d" 'lsp-ui-flycheck-list
+   "a" 'forward-list
+   "x" 'toggle-truncate-lines)
 
+  (general-define-key
+   :states '(normal visual)
+   :prefix "<SPC> T"
+   "c" 'column-number-mode
+   "h" 'hl-line-mode
+   "i" 'aggressive-indent-mode
+   "l" 'toggle-truncate-lines
+   "n" 'display-line-numbers-mode
+   "r" 'rainbow-mode
+   "s" 'flyspell-mode
+   "w" 'whitespace-mode
+   "x" 'toggle-debug-on-error
+   "v" 'visible-mode
+   "t" 'toggle-theme
+   "f" 'auto-fill-mode
+   "g" 'git-gutter-mode
+   "d" 'toggle-debug-on-error
+   "p" 'smartparens-mode
+   "a" 'abbrev-mode
+   "o" 'org-mode
+   "m" 'menu-bar-mode
+   "b" 'tool-bar-mode)
 
-  (use-package general
-    :ensure t
-    :after evil				
-    :config
-    (general-auto-unbind-keys)
-    (general-evil-setup t)
+  (general-define-key
+   :states '(normal visual)
+   "]p" (lambda () (interactive) (evil-paste-after 1) (evil-indent (evil-get-marker ?\[) (evil-get-marker ?\])))
+   "[p" (lambda () (interactive) (evil-paste-before 1) (evil-indent (evil-get-marker ?\[) (evil-get-marker ?\])))
+   "]P" (lambda () (interactive) (evil-paste-after 1))
+   "[P" (lambda () (interactive) (evil-paste-before 1)))
 
-    ;; Set leader key
-    (general-create-definer my/leader-keys
-      ;; :keymaps 'evil-normal-state-map
-      :prefix "C-c"
-      :global-prefix "C-c"
-      :non-normal-prefix "C-c") ;; Optional: a global prefix for non-evil modes
+  ;; Space and blank line operations
+  (general-define-key
+   :states '(normal visual)
+   "]<space>" (lambda () (interactive) (save-excursion (end-of-line) (newline)))
+   "[<space>" (lambda () (interactive) (save-excursion (beginning-of-line) (newline) (forward-line -1))))
 
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "<SPC>"
-      "a" '(:ignore t :which-key "AI")
-      "a a" '(gptel :which-key "Gptel")
-      "a m" '(gptel-menu :which-key "Gptel Menu")
-      )
+  ;; (general-define-key
+  ;;  :states '(normal visual)
+  ;;  :prefix "["
+  ;;  "b" 'previous-buffer
+  ;;  "B" 'beginning-of-buffer
+  ;;  "e" 'move-text-up
+  ;;  ;; "f" 'previous-file
+  ;;  "l" 'previous-error
+  ;;  "L" 'flycheck-previous-error
+  ;;  "q" 'previous-error
+  ;;  "Q" 'flycheck-previous-error
+  ;;  ;; "s" 'flyspell-goto-previous-error
+  ;;  "t" 'tab-previous
+  ;;  "T" 'tab-move-left
+  ;;  "w" 'previous-multiframe-window
+  ;;  "n" 'git-gutter:previous-hunk
+  ;;  "c" 'diff-hl-previous-hunk
+  ;;  "p" 'git-gutter:previous-hunk
+  ;;  "m" 'flymake-goto-prev-error
+  ;;  "d" 'lsp-ui-flycheck-list
+  ;;  "a" 'backward-list
+  ;;  "x" 'toggle-truncate-lines)
 
-    (defun toggle-evil-mode ()
-      "Toggle evil mode between enabled and disabled"
-      (interactive)
-      (if evil-mode
-          (evil-mode -1)
-        (evil-mode 1)))
+  (my/leader-keys
+    :states '(normal visual visual motion)
+    :prefix "<SPC>"
+    "f" '(:ignore t :which-key "Find")
+    "f f" 'find-file
+    "SPC" 'project-find-file
+    "." 'toggle-evil-mode
+    "f b" 'consult-buffer
+    "s" '(:ignore t :which-key "Search")
+    "s D" 'consult-flymake
+    "s d" 'flymake-show-project-diagnostics
+    "s g" 'consult-grep
+    "f p" 'project-find-file
+    "f r" 'consult-recent-file)
 
-    
-    (my/leader-keys
-      ;; :states '(normal visual motion emacs)
-      ;; :prefix "<SPC>"
-      "d" '(:ignore t :which-key "Debugger")
-      "d i" #'dape-info
-      "d d" #'dape
-      "d n" #'dape-next
-      "d r" #'dape-restart
-      "d R" #'dape-repl
-      "d c" #'dape-continue
-      "d o" #'dape-step-out
-      "d s" #'dape-step-in
-      "d q" #'dape-quit
-      "d p" #'dape-pause
-      "d w" #'dape-watch-dwim
-      "d b" #'dape-breakpoint-toggle
-      "d B" #'dape-breakpoint-remove-all
-      "d e" #'dape-breakpoint-expression
-      "d x" #'dape-evaluate-expression
-      )
+  
+  (my/leader-keys
+    "f" '(:ignore t :which-key "Find")
+    "f f" 'find-file
+    "SPC" 'project-find-file
+    "." 'toggle-evil-mode
+    "f b" 'consult-buffer
+    "s" '(:ignore t :which-key "Search")
+    "s D" 'consult-flymake
+    "s d" 'flymake-show-project-diagnostics
+    "s g" 'consult-grep
+    "f p" 'project-find-file
+    "f r" 'consult-recent-file)
 
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "<SPC>"
-      "d" '(:ignore t :which-key "Debugger")
-      "d i" #'dape-info
-      "d d" #'dape
-      "d n" #'dape-next
-      "d r" #'dape-restart
-      "d R" #'dape-repl
-      "d c" #'dape-continue
-      "d o" #'dape-step-out
-      "d s" #'dape-step-in
-      "d q" #'dape-quit
-      "d p" #'dape-pause
-      "d w" #'dape-watch-dwim
-      "d b" #'dape-breakpoint-toggle
-      "d B" #'dape-breakpoint-remove-all
-      "d e" #'dape-breakpoint-expression
-      "d x" #'dape-evaluate-expression
-      )
+  (my/leader-keys
+    ;; :states '(normal visual motion emacs)
+    ;; :prefix "<SPC>"
+    "b" '(:ignore t :which-key "Buffers")
+    "b p" '(consult-project-buffer :which-key "Project buffers")
+    "b i" 'ibuffer)
 
-    (general-define-key
-     :states '(normal visual)
-     :prefix "]"
-     "b" 'next-buffer
-     "B" 'end-of-buffer
-     "e" 'move-text-down
-     ;; "f" 'next-file
-     "l" 'next-error
-     "L" 'flycheck-next-error
-     "q" 'flymake-goto-next-error
-     "Q" 'flycheck-next-error
-     ;; "s" 'flyspell-goto-next-error
-     "t" 'tab-next
-     "T" 'tab-move-right
-     "w" 'next-multiframe-window
-     "n" 'git-gutter:next-hunk
-     "c" 'diff-hl-next-hunk
-     "p" 'git-gutter:next-hunk
-     "m" 'flymake-goto-next-error
-     "d" 'lsp-ui-flycheck-list
-     "a" 'forward-list
-     "x" 'toggle-truncate-lines)
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "<SPC>"
+    "b" '(:ignore t :which-key "Buffers")
+    "b p" '(consult-project-buffer :which-key "Project buffers")
+    "b i" 'ibuffer)
 
-    
-    (general-define-key
-     :states '(normal visual)
-     :prefix "["
-     "b" 'previous-buffer
-     "B" 'end-of-buffer
-     "e" 'move-text-down
-     ;; "f" 'previous-file
-     "l" 'previous-error
-     "L" 'flycheck-previous-error
-     "q" 'flymake-goto-previous-error
-     "Q" 'flycheck-previous-error
-     ;; "s" 'flyspell-goto-previous-error
-     "t" 'tab-previous
-     "T" 'tab-move-right
-     "w" 'previous-multiframe-window
-     "n" 'git-gutter:previous-hunk
-     "c" 'diff-hl-previous-hunk
-     "p" 'git-gutter:previous-hunk
-     "m" 'flymake-goto-previous-error
-     "d" 'lsp-ui-flycheck-list
-     "a" 'forward-list
-     "x" 'toggle-truncate-lines)
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "<SPC>"
+    "o" '(:ignore t :which-key "Org")
+    "o a" '(org-agenda :which-key "Org agenda"))
 
-    (general-define-key
-     :states '(normal visual)
-     :prefix "<SPC> T"
-     "c" 'column-number-mode
-     "h" 'hl-line-mode
-     "i" 'aggressive-indent-mode
-     "l" 'toggle-truncate-lines
-     "n" 'display-line-numbers-mode
-     "r" 'rainbow-mode
-     "s" 'flyspell-mode
-     "w" 'whitespace-mode
-     "x" 'toggle-debug-on-error
-     "v" 'visible-mode
-     "t" 'toggle-theme
-     "f" 'auto-fill-mode
-     "g" 'git-gutter-mode
-     "d" 'toggle-debug-on-error
-     "p" 'smartparens-mode
-     "a" 'abbrev-mode
-     "o" 'org-mode
-     "m" 'menu-bar-mode
-     "b" 'tool-bar-mode)
+  (my/leader-keys
+    ;; :states '(normal visual motion emacs)
+    ;; :prefix "<SPC>"
+    "o" '(:ignore t :which-key "Org")
+    "o a" '(org-agenda :which-key "Org agenda"))
 
-    (general-define-key
-     :states '(normal visual)
-     "]p" (lambda () (interactive) (evil-paste-after 1) (evil-indent (evil-get-marker ?\[) (evil-get-marker ?\])))
-     "[p" (lambda () (interactive) (evil-paste-before 1) (evil-indent (evil-get-marker ?\[) (evil-get-marker ?\])))
-     "]P" (lambda () (interactive) (evil-paste-after 1))
-     "[P" (lambda () (interactive) (evil-paste-before 1)))
+  
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "<SPC>"
+    "p" '(:ignore t :which-key "Projects")
+    "p s" 'project-switch-project
+    "p f" 'project-find-file
+    "p b" 'consult-project-buffer
+    "p d" 'project-dired
+    "p g" 'project-search
+    "p r" 'project-query-replace-regexp
+    "p c" 'project-compile
+    "p t" 'projectile-test-project
+    "p k" 'project-kill-buffers
+    "p D" 'project-remember-projects-under)
 
-    ;; Space and blank line operations
-    (general-define-key
-     :states '(normal visual)
-     "]<space>" (lambda () (interactive) (save-excursion (end-of-line) (newline)))
-     "[<space>" (lambda () (interactive) (save-excursion (beginning-of-line) (newline) (forward-line -1))))
+  (my/leader-keys
+    ;; :states '(normal visual motion emacs)
+    ;; :prefix "<SPC>"
+    "p" '(:ignore t :which-key "Projects")
+    "p s" 'project-switch-project
+    "p f" 'project-find-file
+    "p b" 'consult-project-buffer
+    "p d" 'project-dired
+    "p g" 'project-search
+    "p r" 'project-query-replace-regexp
+    "p c" 'project-compile
+    "p t" 'projectile-test-project
+    "p k" 'project-kill-buffers
+    "p D" 'project-remember-projects-under)
 
-    ;; (general-define-key
-    ;;  :states '(normal visual)
-    ;;  :prefix "["
-    ;;  "b" 'previous-buffer
-    ;;  "B" 'beginning-of-buffer
-    ;;  "e" 'move-text-up
-    ;;  ;; "f" 'previous-file
-    ;;  "l" 'previous-error
-    ;;  "L" 'flycheck-previous-error
-    ;;  "q" 'previous-error
-    ;;  "Q" 'flycheck-previous-error
-    ;;  ;; "s" 'flyspell-goto-previous-error
-    ;;  "t" 'tab-previous
-    ;;  "T" 'tab-move-left
-    ;;  "w" 'previous-multiframe-window
-    ;;  "n" 'git-gutter:previous-hunk
-    ;;  "c" 'diff-hl-previous-hunk
-    ;;  "p" 'git-gutter:previous-hunk
-    ;;  "m" 'flymake-goto-prev-error
-    ;;  "d" 'lsp-ui-flycheck-list
-    ;;  "a" 'backward-list
-    ;;  "x" 'toggle-truncate-lines)
+  
+  (general-define-key
+   :states '(normal visual motion emacs)
+   :override t
+   :modes '(dape-info-modules-mode
+    	    dape-info-sources-mode
+    	    dape-info-stack-mode
+    	    dape-info-watch-mode
+    	    dape-info-breakpoints-mode
+    	    dape-info-threads-mode)
+   :priority 10000
+   ;; :keymaps '(dape-info-modules-mode
+   ;; 	dape-info-sources-mode
+   ;; 	dape-info-stack-mode
+   ;; 	dape-info-watch-mode
+   ;; 	dape-info-breakpoints-mode
+   ;; 	dape-info-threads-mode)
+   "<tab>" #'dape--info-buffer-tab)
+  
+  (my/leader-keys
+    :states '(normal visual motion)
+    :prefix "g"
+    "O" 'consult-imenu
+    "S" 'consult-eglot-symbols
+    "r n" 'eglot-rename
+    "r a" 'eglot-code-actions
+    "r f" 'eglot-format
+    "r i" 'eglot-find-implementation
+    "r r" 'xref-find-references
+    "r t" 'eglot-find-declaration)
 
-    (my/leader-keys
-      :states '(normal visual visual motion)
-      :prefix "<SPC>"
-      "f" '(:ignore t :which-key "Find")
-      "f f" 'find-file
-      "SPC" 'project-find-file
-      "." 'toggle-evil-mode
-      "f b" 'consult-buffer
-      "s" '(:ignore t :which-key "Search")
-      "s D" 'consult-flymake
-      "s d" 'flymake-show-project-diagnostics
-      "s g" 'consult-grep
-      "f p" 'project-find-file
-      "f r" 'consult-recent-file)
+  (my/leader-keys
+    ;; :states '(normal visual motion)
+    :prefix "C-c l"
+    :global-prefix "C-c l"
+    :non-normal-prefix "C-c l"
+    "n" 'eglot-rename
+    "a" 'eglot-code-actions
+    "f" 'eglot-format
+    "i" 'eglot-find-implementation
+    "r" 'xref-find-references
+    "t" 'eglot-find-declaration)
 
-        
-    (my/leader-keys
-      "f" '(:ignore t :which-key "Find")
-      "f f" 'find-file
-      "SPC" 'project-find-file
-      "." 'toggle-evil-mode
-      "f b" 'consult-buffer
-      "s" '(:ignore t :which-key "Search")
-      "s D" 'consult-flymake
-      "s d" 'flymake-show-project-diagnostics
-      "s g" 'consult-grep
-      "f p" 'project-find-file
-      "f r" 'consult-recent-file)
+  (my/leader-keys
+    :prefix "C-c c"
+    :global-prefix "C-c c"
+    :non-normal-prefix "C-c c"
+    ;;:states '(normal visual motion)
+    "O" 'consult-imenu
+    "S" 'consult-eglot-symbols
+    "r a" 'eglot-code-actions
+    "r n" 'eglot-rename
+    "r r" 'eglot-find-references
+    "r t" 'eglot-find-typeDefinition
+    "c c" 'evil-commentary)
 
-    (my/leader-keys
-      ;; :states '(normal visual motion emacs)
-      ;; :prefix "<SPC>"
-      "b" '(:ignore t :which-key "Buffers")
-      "b p" '(consult-project-buffer :which-key "Project buffers")
-      "b i" 'ibuffer)
+  (general-create-definer my/flutter-leader
+    :states '(normal visual)
+    :keymaps 'dart-mode-map
+    :prefix "C-c m"
+    :global-prefix "C-c m"
+    :non-normal-prefix "C-c m")
 
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "<SPC>"
-      "b" '(:ignore t :which-key "Buffers")
-      "b p" '(consult-project-buffer :which-key "Project buffers")
-      "b i" 'ibuffer)
+  (my/flutter-leader
+    "f r" #'flutter-run-or-hot-reload
+    "f R" #'flutter-hot-restart)
 
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "<SPC>"
-      "o" '(:ignore t :which-key "Org")
-      "o a" '(org-agenda :which-key "Org agenda"))
+  ;; Reload config
+  (general-create-definer my/config-keys
+    ;;:keymaps 'evil-normal-state-map
+    ;; :prefix "h"
+    ;; :global-prefix "C-c h"
+    ;; :non-normal-prefix "C-c h"
+    :states '(normal emacs))
 
-    (my/leader-keys
-      ;; :states '(normal visual motion emacs)
-      ;; :prefix "<SPC>"
-      "o" '(:ignore t :which-key "Org")
-      "o a" '(org-agenda :which-key "Org agenda"))
-
-        
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "<SPC>"
-      "p" '(:ignore t :which-key "Projects")
-      "p s" 'project-switch-project
-      "p f" 'project-find-file
-      "p b" 'consult-project-buffer
-      "p d" 'project-dired
-      "p g" 'project-search
-      "p r" 'project-query-replace-regexp
-      "p c" 'project-compile
-      "p t" 'projectile-test-project
-      "p k" 'project-kill-buffers
-      "p D" 'project-remember-projects-under)
-
-    (my/leader-keys
-      ;; :states '(normal visual motion emacs)
-      ;; :prefix "<SPC>"
-      "p" '(:ignore t :which-key "Projects")
-      "p s" 'project-switch-project
-      "p f" 'project-find-file
-      "p b" 'consult-project-buffer
-      "p d" 'project-dired
-      "p g" 'project-search
-      "p r" 'project-query-replace-regexp
-      "p c" 'project-compile
-      "p t" 'projectile-test-project
-      "p k" 'project-kill-buffers
-      "p D" 'project-remember-projects-under)
-
-    
-    (general-define-key
-     :states '(normal visual motion emacs)
-     :override t
-     :modes '(dape-info-modules-mode
-    	        dape-info-sources-mode
-    	        dape-info-stack-mode
-    	        dape-info-watch-mode
-    	        dape-info-breakpoints-mode
-    	        dape-info-threads-mode)
-     :priority 10000
-     ;; :keymaps '(dape-info-modules-mode
-     ;; 	dape-info-sources-mode
-     ;; 	dape-info-stack-mode
-     ;; 	dape-info-watch-mode
-     ;; 	dape-info-breakpoints-mode
-     ;; 	dape-info-threads-mode)
-     "<tab>" #'dape--info-buffer-tab)
-    
-    (my/leader-keys
-      :states '(normal visual motion)
-      :prefix "g"
-      "O" 'consult-imenu
-      "S" 'consult-eglot-symbols
-      "r n" 'eglot-rename
-      "r a" 'eglot-code-actions
-      "r f" 'eglot-format
-      "r i" 'eglot-find-implementation
-      "r r" 'xref-find-references
-      "r t" 'eglot-find-declaration)
-
-    (my/leader-keys
-      ;; :states '(normal visual motion)
-      :prefix "C-c l"
-      :global-prefix "C-c l"
-      :non-normal-prefix "C-c l"
-      "n" 'eglot-rename
-      "a" 'eglot-code-actions
-      "f" 'eglot-format
-      "i" 'eglot-find-implementation
-      "r" 'xref-find-references
-      "t" 'eglot-find-declaration)
-
-    (my/leader-keys
-      :prefix "C-c c"
-      :global-prefix "C-c c"
-      :non-normal-prefix "C-c c"
-      ;;:states '(normal visual motion)
-      "O" 'consult-imenu
-      "S" 'consult-eglot-symbols
-      "r a" 'eglot-code-actions
-      "r n" 'eglot-rename
-      "r r" 'eglot-find-references
-      "r t" 'eglot-find-typeDefinition
-      "c c" 'evil-commentary)
-
-    (general-create-definer my/flutter-leader
-      :states '(normal visual)
-      :keymaps 'dart-mode-map
-      :prefix "C-c m"
-      :global-prefix "C-c m"
-      :non-normal-prefix "C-c m")
-
-    (my/flutter-leader
-      "f r" #'flutter-run-or-hot-reload
-      "f R" #'flutter-hot-restart)
-
-    ;; Reload config
-    (general-create-definer my/config-keys
-      ;;:keymaps 'evil-normal-state-map
-      ;; :prefix "h"
-      ;; :global-prefix "C-c h"
-      ;; :non-normal-prefix "C-c h"
-      :states '(normal emacs))
-
-    (my/leader-keys
-      ;; :states '(normal visual motion emacs)
-      :prefix "C-c"
-      "h r r" (lambda ()
-                (interactive)
-                (org-babel-tangle-file (expand-file-name "config.org" user-emacs-directory))
-                (load-file (expand-file-name "init.el" user-emacs-directory)))
-      :which-key "Reload Config"
-      "h c" (lambda ()
+  (my/leader-keys
+    ;; :states '(normal visual motion emacs)
+    :prefix "C-c"
+    "h r r" (lambda ()
               (interactive)
-              (find-file (expand-file-name "config.org" user-emacs-directory)))
-      :which-key "Open Config"
-      "h l" 'check-parens))
+              (let* ((org-file (expand-file-name "config.org" user-emacs-directory))
+                     (el-file "~/.cache/emacs/config.el"))
+                ;; Ensure cache directory exists
+                (make-directory (file-name-directory el-file) t)
+                
+                ;; Tangle if needed (org newer than el, or el doesn't exist)
+                (when (or (not (file-exists-p el-file))
+                          (file-newer-than-file-p org-file el-file))
+                  (org-babel-tangle-file org-file))
+                
+                ;; Load the tangled file from cache directory
+                (load el-file)))
+    :which-key "Reload Config"
+    "h c" (lambda ()
+            (interactive)
+            (find-file (expand-file-name "config.org" user-emacs-directory)))
+    :which-key "Open Config"
+    "h l" 'check-parens))
 #+end_src
 
 * MAIL
