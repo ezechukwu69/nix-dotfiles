@@ -64,6 +64,11 @@
 		userEmail = "ezechukwu69@gmail.com";
 	};
 
+	programs.fzf = {
+		enable = true;
+		enableZshIntegration = true;
+	};
+
 	programs.emacs = {
 		enable = true;
 		extraPackages = epkgs: with epkgs; [
@@ -102,6 +107,11 @@
 		shellAliases = {
 			rebuild = "sudo nixos-rebuild switch --flake . --impure";
 		};
+		envExtra = ''
+			export ANDROID_HOME="~/Android/Sdk"
+			export PATH="$HOME/Android/Sdk/platform-tools/:$PATH"
+			'';
+
 	};
 
 	programs.zen-browser = {

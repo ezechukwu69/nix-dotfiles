@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -10,9 +10,14 @@
     ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  #boot.loader.systemd-boot.secureBoot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelModules = ["uinput"];
+  boot.lanzaboote = {
+          enable = true;
+          pkiBundle = "/var/lib/sbctl";
+  };
   
   hardware.uinput.enable = true;
 
@@ -65,9 +70,9 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.displayManager.gdm.wayland = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+  services.desktopManager.gnome.enable = true;
 
   services.udev.extraRules = ''
     KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -141,6 +146,7 @@
     kanata
     matugen
     hypridle
+    sbctl
     hyprcursor
     hyprshot
     hyprpanel
@@ -151,6 +157,17 @@
     killall
     libnotify
     mako
+  ];
+
+
+  programs.nix-ld.enable = true;
+
+  programs.nix-ld.libraries = with pkgs; [
+
+# Add any missing dynamic libraries for unpackaged programs
+
+# here, NOT in environment.systemPackages
+
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
