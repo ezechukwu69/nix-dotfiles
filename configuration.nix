@@ -110,7 +110,7 @@
   users.users.ezechukwu69 = {
     isNormalUser = true;
     description = "Ezechukwu Ojukwu";
-    extraGroups = [ "networkmanager" "wheel" "uinput" "input" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "uinput" "input" "video" "docker" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
     #  thunderbird
@@ -145,6 +145,7 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     kanata
     matugen
+    docker-compose
     hypridle
     sbctl
     hyprcursor
@@ -159,6 +160,9 @@
     mako
   ];
 
+  virtualisation.docker = {
+	  enable = true;
+  };
 
   programs.nix-ld.enable = true;
 

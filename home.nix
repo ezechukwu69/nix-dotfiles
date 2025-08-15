@@ -17,12 +17,19 @@
 	home.packages = with pkgs; [
 		btop
  		ripgrep
+		vivaldi
 		tree
+		rofi
+		albert
+		zellij
+		lazydocker
 		neofetch
 		zip
 		unzip
 		spotify
 		jq
+  		postman
+		jujutsu
 		eza
 		fzf
 		nerd-fonts.jetbrains-mono
@@ -105,7 +112,7 @@
 			enable = true;
 		};
 		shellAliases = {
-			rebuild = "sudo nixos-rebuild switch --flake . --impure";
+			rebuild = "sudo nixos-rebuild switch --flake ~/nixos --impure";
 		};
 		envExtra = ''
 			export ANDROID_HOME="~/Android/Sdk"

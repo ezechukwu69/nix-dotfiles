@@ -4,5 +4,5 @@
 !config.org
 !keybindings.org
 !init.el
-!lisp/
+!lisp/*
 !.gitignore
