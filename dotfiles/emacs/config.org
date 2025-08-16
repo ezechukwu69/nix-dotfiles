@@ -150,7 +150,8 @@
 #+begin_src emacs-lisp
   (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
   (setq package-user-dir (expand-file-name "~/.cache/elpa/"))
-  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+  (setq emacs-config-dir (expand-file-name "~/.config/emacs"))
+  (add-to-list 'load-path (expand-file-name "lisp" emacs-config-dir))
   (require 'package)
   (setq package-archives '(
   			             ("elpa" . "https://elpa.gnu.org/packages/")
@@ -1222,7 +1223,7 @@ Essential emacs defaults
     :prefix "C-c"
     "h r r" (lambda ()
               (interactive)
-              (let* ((org-file (expand-file-name "config.org" user-emacs-directory))
+              (let* ((org-file (expand-file-name "config.org" emacs-config-dir))
                      (el-file "~/.cache/emacs/config.el"))
                 ;; Ensure cache directory exists
                 (make-directory (file-name-directory el-file) t)

@@ -146,10 +146,12 @@
     kanata
     matugen
     docker-compose
+    glibc
     hypridle
     sbctl
     hyprcursor
     hyprshot
+    wl-clipboard
     hyprpanel
     hyprsunset
     hyprpicker
@@ -158,6 +160,10 @@
     killall
     libnotify
     mako
+    rustup
+    gcc
+    toilet
+    ffmpeg
   ];
 
   virtualisation.docker = {

@@ -18,6 +18,7 @@
 (require 'dape)
 (require 'project)
 (require 'dart-mode nil t)
+(require 'apheleia nil t)
 
 (defgroup ez-flutter nil
   "Interactive Flutter commands with dape integration."
@@ -42,6 +43,11 @@
 
 (defvar ez-flutter--devices-cache-time nil
   "Time when devices were last cached.")
+
+(defvar ez-flutter--reload-timer nil
+  "Timer for delayed hot reload to avoid conflicts with formatters.")
+
+
 
 (defconst ez-flutter--cache-duration 30
   "Duration in seconds to cache device list.")
@@ -186,12 +192,25 @@
 ;;; Auto-reload on save
 
 (defun ez-flutter--auto-reload ()
-  "Automatically run hot reload if enabled and in a Flutter project."
+  "Automatically run hot reload if enabled and in a Flutter project.
+Uses a timer to avoid conflicts with formatters like apheleia."
   (when (and ez-flutter-auto-reload-on-save
              (ez-flutter--find-project-root)
              ez-flutter--dape-process
              (process-live-p ez-flutter--dape-process))
-    (ez/flutter-hot-reload)))
+    
+    ;; Cancel any existing timer
+    (when ez-flutter--reload-timer
+      (cancel-timer ez-flutter--reload-timer))
+    
+    ;; Set a new timer to delay the reload
+    (setq ez-flutter--reload-timer
+          (run-with-timer ez-flutter-reload-delay nil
+                          (lambda ()
+                            (setq ez-flutter--reload-timer nil)
+                            ;; Check if buffer is still modified (formatter might still be running)
+                            (unless (buffer-modified-p)
+                              (ez/flutter-hot-reload)))))))
 
 ;;;###autoload
 (defun ez-flutter-enable-auto-reload ()
