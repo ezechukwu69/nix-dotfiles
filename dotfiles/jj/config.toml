@@ -1,0 +1,41 @@
+[user]
+email = "ezechukwu69@gmail.com"
+name = "ezechukwu69"
+
+[merge-tools.meld]
+program = "meld"      # Defaults to the name of the tool if not specified
+edit-args = ["--newtab", "$left", "$right"]
+
+
+[merge-tools.ediff]
+program = "emacs"      # Defaults to the name of the tool if not specified
+edit-args = ["--eval", "(ediff-directories \"$left\" \"$right\" \".*\")"]
+
+[ui]
+editor = "emacs -w"
+default-command = "log"
+always-allow-large-revsets = true
+color = "always"
+# diff-editor = "ediff"
+# merge-editor = "smerge"
+pager = ["delta", "--paging", "always"]
+diff-formatter = ":git"
+
+[ui.streampager]
+interface = "full-screen-clear-output"
+
+[aliases]
+init = ["git", "init"]
+push = ["git", "push"]
+pull = ["git", "fetch"]
+bs = ["bookmark", "set"]
+
+[core]
+fsmonitor = "watchman"
+
+[revsets]
+log = "all()"
+#'present(@) | ancestors(immutable_heads().., 2) | present(trunk())'
+
+[templates]
+log = "builtin_log_compact_full_description"
