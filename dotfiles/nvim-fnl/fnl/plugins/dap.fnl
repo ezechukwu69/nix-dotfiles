@@ -3,10 +3,12 @@
 (vim.pack.add [
     "https://github.com/rcarriga/nvim-dap-ui"
     "https://github.com/mfussenegger/nvim-dap"
+    "https://github.com/theHamsta/nvim-dap-virtual-text"
 ])
 
 (local dap (require :dap))
 (local dapui (require :dapui))
+(local virtual-text (require :nvim-dap-virtual-text))
 (dapui.setup)
 
 (set dap.listeners.before.attach.dapui_config (fn []
@@ -21,6 +23,11 @@
 (set dap.listeners.before.event_exited.dapui_config (fn []
     (dapui.close)
 ))
+
+(virtual-text.setup {
+                    :enabled true
+                    :virt_text_pos "inline"
+                    })
 
 (local vscode (require "dap.ext.vscode"))
 (local json (require "plenary.json"))

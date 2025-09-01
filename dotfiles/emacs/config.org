@@ -35,6 +35,7 @@
 - [[#dired][DIRED]]
 - [[#formatters][FORMATTERS]]
 - [[#padding][PADDING]]
+- [[#perspective][PERSPECTIVE]]
 - [[#final-fixes][FINAL FIXES]]
 - [[#linux-system][LINUX SYSTEM]]
 - [[#custom-function][CUSTOM FUNCTION]]
@@ -89,10 +90,10 @@
   (setq recentf-max-saved-items 200)    ;; Increase the number of saved files
   (setq recentf-auto-cleanup 'never)    ;; Disable automatic cleanup
   (setq recentf-exclude '("/tmp/" "/ssh:")) ;; Ignore temporary files
-  ;; (defvar font-family "Aporetic Serif Mono")
+  (defvar font-family "Aporetic Sans Mono")
   ;; (defvar font-family "Iosevka Comfy")
   ;;(defvar font-family "Pragmasevka Nerd Font")
-  (defvar font-family "JetBrainsMono Nerd Font")
+  ;; (defvar font-family "JetBrainsMono Nerd Font")
   ;;(defvar my-cache-dir
     ;;(expand-file-name "emacs/" (or (getenv "XDG_CACHE_HOME") "~/.cache"))
    ;; "Directory to store all Emacs cache and generated files.")
@@ -101,8 +102,18 @@
                         (or (getenv "XDG_CACHE_HOME") 
                             "~/.cache/emacs/")))
 
+
+  (setq my-autosave-dir
+      (expand-file-name "auto-save" 
+                        (or (getenv "XDG_CACHE_HOME") 
+                            "~/.cache/emacs/")))
+
   (unless (file-exists-p my-cache-dir)
     (make-directory my-cache-dir t))
+
+
+  (unless (file-exists-p my-autosave-dir)
+    (make-directory my-autosave-dir t))
 
   ;; Move various generated files:
   (setq
@@ -114,7 +125,7 @@
 
    ;; Auto-save and backups
    backup-directory-alist `(("." . ,(expand-file-name "backups/" my-cache-dir)))
-   auto-save-file-name-transforms `((".*" ,(expand-file-name "auto-save/" my-cache-dir) t))
+   auto-save-file-name-transforms `((".*" ,(expand-file-name my-autosave-dir) t))
    auto-save-list-file-prefix (expand-file-name "auto-save-list/.saves-" my-cache-dir)
 
    ;; URL cache
@@ -195,7 +206,8 @@ Install corfu nerd icons with =package-install nerd-icons-corfu=
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-ayu-dark t)
+  ;; (load-theme 'doom-ayu-dark t)
+  (load-theme 'doom-gruvbox t)
   (doom-themes-org-config)
   ) 
 
@@ -314,17 +326,21 @@ Essential emacs defaults
 
 ;; Example: Set font (replace with your preferred font and size)
 (set-face-attribute 'default nil
-  		            :font (format "%s-10.5:weight=extra-bold" font-family))
+                    :family font-family
+                    :height 107  ; 10.5pt = 105 (height is in 1/10 points)
+                    :weight 'bold)
 
 (set-face-attribute 'variable-pitch nil
-  		            :font (format "%s-11:weight=extra-bold" font-family))
+                    :family font-family
+                    :height 130  ; 11pt = 110
+                    :weight 'bold)
 
 (set-face-attribute 'font-lock-comment-face nil
                     :slant 'italic
                     :weight 'normal)
 
 (set-face-attribute 'font-lock-keyword-face nil
-                    :weight 'extra-bold)
+                    :weight 'bold)
 
 ;; (set-face-attribute 'org-document-title nil
 ;;                     :family font-family
@@ -574,7 +590,7 @@ Essential emacs defaults
 (use-package evil-textobj-entire
   :ensure t
   :config
-(setq evil-want-change-word-to-end t)) 
+  (setq evil-want-change-word-to-end t)) 
 
 
 (use-package evil-snipe
@@ -685,12 +701,12 @@ Essential emacs defaults
   :ensure t
   :config
   (define-key evil-outer-text-objects-map "f"
-              (evil-textobj-tree-sitter-get-textobj "function.outer"))
+              (evil-textobj-tree-sitter-get-textobj "method.outer"))
   (define-key evil-inner-text-objects-map "f"
-              (evil-textobj-tree-sitter-get-textobj "function.inner"))
-  (define-key evil-outer-text-objects-map "C"
+              (evil-textobj-tree-sitter-get-textobj "method.inner"))
+  (define-key evil-outer-text-objects-map "c"
               (evil-textobj-tree-sitter-get-textobj "class.outer"))
-  (define-key evil-inner-text-objects-map "C"
+  (define-key evil-inner-text-objects-map "c"
         	  (evil-textobj-tree-sitter-get-textobj "class.inner"))
   )
 
@@ -698,14 +714,28 @@ Essential emacs defaults
   :defer t
   :ensure t
   :config
-  (setq evil-textobj-anyblock-blocks
-        '(("(" . ")")
-          ("{" . "}")
-          ("'" . "'")
-          ("\"" . "\"")
-          ("`" . "`")
-          ("\\[" . "\\]")
-          ("<" . ">"))))
+  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "'")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count nil)))
+
+  (evil-define-text-object my-evil-textobj-anyblock-a-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "'")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count t)))
+
+  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
+  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote))
 
 (use-package evil-visualstar
   :ensure t
@@ -1091,7 +1121,7 @@ Essential emacs defaults
     ;; :prefix "<SPC>"
     "b" '(:ignore t :which-key "Buffers")
     "b p" '(consult-project-buffer :which-key "Project buffers")
-    "b i" 'ibuffer)
+    "b i" 'persp-ibuffer)
 
   (my/leader-keys
     :states '(normal visual motion)
@@ -1334,54 +1364,34 @@ Markdown Mode
     :after treesit
     :ensure t)
 
+  (use-package flymake
+   :config
+   (add-hook 'prog-mode-hook 'flymake-mode)
+   (setq flymake-show-diagnostics-at-end-of-line t))
+
   (use-package treesit
     :ensure nil
     :init
-    (setq treesit-language-source-alist
-  	    '((templ "https://github.com/vrischmann/tree-sitter-templ")
-  	      (bash "https://github.com/tree-sitter/tree-sitter-bash")
-  	      (cmake "https://github.com/uyha/tree-sitter-cmake")
-            (c "https://github.com/tree-sitter/tree-sitter-c")
-  	      (css "https://github.com/tree-sitter/tree-sitter-css")
-            (dart "https://github.com/UserNobody14/tree-sitter-dart")
-  	      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-  	      (go "https://github.com/tree-sitter/tree-sitter-go")
-  	      (gomod "https://github.com/camdencheek/tree-sitter-go-mod")
-  	      (html "https://github.com/tree-sitter/tree-sitter-html")
-  	      (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-  	      (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-  	      (json "https://github.com/tree-sitter/tree-sitter-json")
-  	      (make "https://github.com/alemuller/tree-sitter-make")
-  	      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-  	      (python "https://github.com/tree-sitter/tree-sitter-python")
-            (ruby "https://github.com/tree-sitter/tree-sitter-ruby")
-  	      (toml "https://github.com/tree-sitter/tree-sitter-toml")
-  	      (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-  	      (typescript "https://github.com/tree-sitter/tree-sitter-typescript"
-  		              "master" "typescript/src")
-  	      (yaml "https://github.com/ikatyang/tree-sitter-yaml")
-  	      (haskell "https://github.com/tree-sitter/tree-sitter-haskell")
-  	      (typst "https://github.com/uben0/tree-sitter-typst")
-  	      (java "https://github.com/tree-sitter/tree-sitter-java")
-  	      (ruby "https://github.com/tree-sitter/tree-sitter-ruby")
-  	      (rust "https://github.com/tree-sitter/tree-sitter-rust")
-  	      (zig "https://github.com/tree-sitter-grammars/tree-sitter-zig")
-  	      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")))
-    (setq major-mode-remap-alist
-  	    '((bash-mode . bash-ts-mode)
-            (c-mode . c-ts-mode)
-            (c++-mode . c++-ts-mode)
-            (css-mode . css-ts-mode)
-            (js-mode . js-ts-mode)
-            (json-mode . json-ts-mode)
-            (python-mode . python-ts-mode)
-            (ruby-mode . ruby-ts-mode)
-            (typescript-mode . typescript-ts-mode)))
     (setopt treesit-font-lock-level 4)
     (global-tree-sitter-mode)
     (add-hook 'prog-mode-hook #'tree-sitter-hl-mode)
-    (add-hook 'prog-mode-hook #'enable-font-lock-mode)
-    )
+    (add-hook 'prog-mode-hook #'enable-font-lock-mode))
+
+  (use-package treesit-auto
+   :ensure t
+   :custom
+   (treesit-auto-install 'prompt)
+   :config
+   ;;(setq treesit-auto-langs '(javascript
+   ;;                          typescript
+   ;;                          yaml
+   ;;                          toml
+   ;;                          php
+   ;;                          tsx
+   ;;                          css
+   ;;                          html))
+   (treesit-auto-add-to-auto-mode-alist 'all)
+   (global-treesit-auto-mode))
 #+end_src
 
 * EGLOT
@@ -1548,8 +1558,7 @@ Markdown Mode
         (interactive)
         (beginning-of-line)
         (set-mark-command nil)
-        (end-of-line)
-        )
+        (end-of-line))
 
       (defun toggle-evil-mode ()
         "Toggle evil mode"
@@ -1561,6 +1570,10 @@ Markdown Mode
           (evil-mode 1)
           (message "Evil mode enabled")
           ))
+
+
+      (global-set-key (kbd "C-x <") #'minimize-window)
+      (global-set-key (kbd "C-x >") #'maximize-window)
 
       (with-eval-after-load 'corfu
         ;; Corfu-specific bindings - these should remain in corfu-map
@@ -1749,17 +1762,6 @@ Set the commands to run for eglot
                                                   (insertSpaceAfterSemicolonInForStatements . t)
                                                   (insertSpaceBeforeAndAfterBinaryOperators . t)
                                                   (insertSpaceAfterKeywordsInControlFlowStatements . t))))))))))
-#+end_src
-
-Set filetype modes
-
-  #+begin_src emacs-lisp
-    ;; No external package needed — this mode exists in Emacs core
-
-    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . tsx-ts-mode))
 #+end_src
 
 Also set the eglot auto start
@@ -2030,7 +2032,16 @@ GPTEL
     (define-key global-map (kbd "<f8>") #'spacious-padding-mode)
     )
 #+end_src
-
+* PERSPECTIVE
+#+begin_src emacs-lisp
+(use-package perspective
+  :ensure t
+  :bind (("C-x k" . persp-kill-buffer*))
+  :custom
+  (persp-mode-prefix-key (kbd "C-x x"))
+  :init
+  (persp-mode))
+#+end_src
 * FINAL FIXES
 #+begin_src emacs-lisp
   ;; (setq window-divider-default-places t

@@ -1,5 +1,5 @@
 format = '''
-$character'''
+$directory $git_branch $character'''
 
 palette = 'colors'
 

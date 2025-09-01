@@ -10,18 +10,16 @@
   {
    ;; Table with textobject id as fields, textobject specification as values.
    ;; Also use this to disable builtin textobjects. See |MiniAi.config|.
-   :custom_textobjects
-   {
-    :f (spec_treesitter {:a ["@function.outer" "@method.outer"]
-                         :i ["@function.inner" "@method.inner"]})
-    :c (spec_treesitter {:a "@class.outer" :i "@class.inner"})
-    :C (spec_treesitter {:a "@comment.outer" :i "@comment.inner"})
-    :a (spec_treesitter {:a "@parameter.inner" :i "@parameter.inner"})
-    :o (spec_treesitter {:a ["@conditional.outer" "@loop.outer"]
-                         :i ["@conditional.inner" "@loop.inner"]})
-    :p (spec_treesitter {:a ["@field.outer" "@property.outer"]
-                         :i ["@field.inner" "@property.inner"]})
-    :v (spec_treesitter {:a "@variable.outer" :i "@variable.inner"})}
+   ; :custom_textobjects
+   ; {
+   ;  :f (spec_treesitter {:a ["@function.outer" "@method.outer"]
+   ;                       :i ["@function.inner" "@method.inner"]})
+   ;  :c (spec_treesitter {:a "@class.outer" :i "@class.inner"})
+   ;  :C (spec_treesitter {:a "@comment.outer" :i "@comment.inner"})
+   ;  :a (spec_treesitter {:a "@parameter.inner" :i "@parameter.inner"})
+   ;  :o (spec_treesitter {:a ["@conditional.outer" "@loop.outer"]
+   ;                       :i ["@conditional.inner" "@loop.inner"]})
+   ;  :v (spec_treesitter {:a "@variable.outer" :i "@variable.inner"})}
 
    ;; Module mappings. Use `''` (empty string) to disable one.
    :mappings

@@ -73,6 +73,7 @@
   services.displayManager.gdm.enable = true;
   services.displayManager.gdm.wayland = true;
   services.desktopManager.gnome.enable = true;
+  services.tailscale.enable = true;
 
   services.udev.extraRules = ''
     KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -139,10 +140,17 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+
+  environment.variables = {
+    XKB_CONFIG_ROOT="${pkgs.xkeyboard-config}/share/X11/xkb";
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    curl
+    wget
     kanata
     matugen
     docker-compose
@@ -152,18 +160,57 @@
     hyprcursor
     hyprshot
     wl-clipboard
+    protobuf
+    xkeyboard-config
     hyprpanel
     hyprsunset
     hyprpicker
     hyprpolkitagent
     waybar
     killall
+    wayland
+    wayland-protocols
+    wayland-scanner
     libnotify
     mako
     rustup
     gcc
     toilet
     ffmpeg
+    xorg.libXext
+    xorg.libX11
+# android studio
+    alsa-lib
+    dbus
+    expat
+    libbsd
+    libpulseaudio
+    libuuid
+    xorg.libXi
+    xorg.libxcb
+    libxkbcommon
+    xorg.xcbutilwm
+    openssl
+    xorg.xcbutilrenderutil
+    xorg.xcbutilkeysyms
+    xorg.xcbutilimage
+    xorg.xcbutilcursor
+    xorg.libICE
+    xorg.libSM
+    xorg.libxkbfile
+    xorg.libXcomposite
+    xorg.libXcursor
+    xorg.libXdamage
+    xorg.libXfixes
+    libGL
+    libdrm
+    libpng
+    nspr
+    nss_latest
+    systemd
+#end
+    vulkan-headers
+    vulkan-loader
   ];
 
   virtualisation.docker = {
@@ -191,6 +238,7 @@
   environment.etc."kanata/kanata.kbd".source = ./dotfiles/kanata/config.kbd;
 
   services.flatpak.enable = true;
+  services.teamviewer.enable = true;
 
   services.hypridle = {
 	enable = true;

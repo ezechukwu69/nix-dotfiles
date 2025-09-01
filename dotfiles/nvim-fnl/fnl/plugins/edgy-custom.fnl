@@ -29,12 +29,12 @@
           ]
           :bottom [
                    {
-                      :title "Dap-REPL"
-                      :ft  :dap-repl
-                   }
-                   {
                       :title "DapUI scopes"
                       :ft  :dapui_scopes
+                   }
+                   {
+                      :title "Dap-REPL"
+                      :ft  :dap-repl
                    }
                    {
                       :title "Quickfix List"

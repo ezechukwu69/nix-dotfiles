@@ -7,6 +7,7 @@
     "https://github.com/rebelot/kanagawa.nvim"
     "https://github.com/folke/tokyonight.nvim"
     "https://github.com/vague2k/vague.nvim"
+    "https://github.com/ellisonleao/gruvbox.nvim"
 ])
 
 ((. (require "vague") :setup)
@@ -60,4 +61,4 @@
 (require :tokyonight)
 (require :jellybeans)
 (require :monoglow)
-(vim.cmd.colorscheme :rose-pine-main)
+(vim.cmd.colorscheme :gruvbox)

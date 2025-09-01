@@ -103,10 +103,10 @@
   :command "<C-w><C-w>"
   :options {:desc "Other window" :noremap true :silent true})
 
-(map!
-  :mode "n" :key "<M-f>"
-  :command "<C-o>e"
-  :options {:desc "Move word forward in insert" :noremap true :silent true})
+; (map!
+;   :mode "n" :key "<M-f>"
+;   :command "<C-o>e"
+;   :options {:desc "Move word forward in insert" :noremap true :silent true})
 
 (map!
   :mode "n" :key "<C-x>h"
@@ -119,11 +119,11 @@
   :options {:desc "Search forward" :noremap true :silent true})
 
 (map!
-  :mode "n" :key "<leader>g g"
-  :command "<cmd>DiffViewOpen<CR>"
+  :mode "n" :key "<leader>gg"
+  :command "<cmd>DiffviewOpen<CR>"
   :options {:desc "Open DiffView" :noremap true :silent true})
 
 (map!
-  :mode "n" :key "<leader>g q"
+  :mode "n" :key "<leader>gq"
   :command "<cmd>DiffviewClose<CR>"
   :options {:desc "Close DiffView" :noremap true :silent true})
