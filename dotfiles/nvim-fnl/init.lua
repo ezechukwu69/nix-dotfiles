@@ -10,7 +10,6 @@ vim.pack.add({
   },
   "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
   "https://github.com/nvim-treesitter/playground",
-  "https://github.com/augmentcode/augment.vim",
   "https://github.com/nvim-treesitter/nvim-treesitter-context"
 })
 
@@ -160,15 +159,6 @@ require("user_commands")
 require("autocommands")
 vim.cmd [[
 set path+=,**
-]]
-
-vim.cmd [[
-inoremap <M-l> <cmd>call augment#Accept("\n")<cr>
-"inoremap <cr> <cmd>call augment#Accept("\n")<cr>
-nnoremap <leader>ac :Augment chat<CR>
-vnoremap <leader>ac :Augment chat<CR>
-nnoremap <leader>an :Augment chat-new<CR>
-nnoremap <leader>at :Augment chat-toggle<CR>
 ]]
 
 local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })

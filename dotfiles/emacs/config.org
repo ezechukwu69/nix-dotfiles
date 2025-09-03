@@ -1793,7 +1793,44 @@ Also set the eglot auto start
     (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode  2)))
 #+end_src
 
+Codeium
+#+begin_src emacs-lisp
+   (use-package codeium
+     :ensure t
+     :vc (:url "https://github.com/Exafunction/codeium.el"
+               :rev :newest
+               :branch "main")
+     :init
+     (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
+     :config
+     (setq use-dialog-box nil)
+     (setq codeium-mode-line-enable
+        (lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
+     (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t))
+#+end_src
+
+Supermaven
+
+#+begin_src emacs-lisp
+;; (use-package supermaven
+;;   :ensure t
+;;   ;; :vc (:url "https://github.com/ezechukwu69/supermaven.el"
+;;   :vc (:url "https://github.com/binbandit/supermaven.el"
+;;             :rev :newest
+;;             :branch "main")
+;;   :hook '((prog-mode . supermaven-mode))
+;;   :config
+;;   (setq supermaven-ignore-filetypes '("txt"))
+;;   (setq supermaven-disable-inline-completion nil)
+;;   (setq supermaven-keymaps
+;;         '((accept-suggestion . "M-l")
+;;           (clear-suggestion . "C-]")
+;;           (accept-word . "M-j")))
+;;   (setq supermaven-log-level 'debug))
+#+end_src
+
 GPTEL
+
 #+begin_src emacs-lisp
   ;; (use-package gptel :vc (:url "https://github.com/karthink/gptel"
   ;;           		     :rev :newest

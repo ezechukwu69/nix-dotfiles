@@ -20,3 +20,4 @@
 (require "plugins/flutter-tools")
 (require "plugins/carenvim")
 (require "plugins/breadcrumb")
+(require "plugins/supermaven")
