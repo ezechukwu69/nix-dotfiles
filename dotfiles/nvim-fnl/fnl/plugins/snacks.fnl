@@ -5,131 +5,222 @@
 
 ;; setup
 (Snacks.setup {
-  :words {}
-  :git {}
-  :gitbrowse {}
-  :dim {}
-  :notifier {}
-  :image {}
-  :scope {}
+              :styles {
+                :terminal {
+                  :wo {
+                    ; :border "rounded"
+                  }
+                }
+              }
+              :words {}
+              :git {}
+              :scroll {}
+              :gitbrowse {}
+              :dim {}
+              :notifier {}
+              :dashboard {
+                ; :width (math.floor (* vim.o.columns 0.7))
+                :height ((fn [] vim.o.lines))
+                :wo {
+                  :border "none"
+                }
+                :pane_gap 8
+                :preset {
+                  :keys  [
+                          {  :icon  " " :key  "f" :desc  "Find File" :action ":lua Snacks.dashboard.pick('files')" }
+                          { :icon  " " :key  "n" :desc  "New File" :action  ":ene | startinsert" }
+                          { :icon  " " :key  "g" :desc  "Find Text" :action  ":lua Snacks.dashboard.pick('live_grep')" }
+                          { :icon  " " :key  "r" :desc  "Recent Files" :action  ":lua Snacks.dashboard.pick('oldfiles')" }
+                          { :icon  " " :key  "c" :desc  "Config" :action  ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" }
+                          { :icon  " " :key  "s" :desc  "Restore Session" :section  "session" }
+                          { :icon  " " :key  "q" :desc  "Quit" :action  ":qa" }
+                  ]
+                  :header (vim.fn.system "toilet -f future 'Ezechukwu69'")
+                }
+                :sections [
+                           { :section "header" }
+                           { :section "keys" :padding 1 }
+                           { :pane 2 :icon  " " :title  "Recent Files" :section  "recent_files" :indent  2 :padding  1 }
+                           ; {
+                           ;   :pane 2
+                           ;   :icon  " "
+                           ;   :desc  "Browse Repo"
+                           ;   :padding  1
+                           ;   :key  "b"
+                           ;   :action (fn [] (Snacks.gitbrowse))
+                           ; }
+                           {
+                             :title  "Notifications"
+                             :cmd  "gh-notify -s -n5"
+                             :section "terminal"
+                             :action  (fn [] (vim.ui.open "https://github.com/notifications"))
+                             :key  "n"
+                             :icon  " "
+                             :height  5
+                             :padding  2
+                             :enabled  (not= nil (Snacks.git.get_root))
+                           }
+                           {
+                             :icon  " "
+                             :title  "Open PRs"
+                             :cmd  "gh pr list -L 3"
+                             :section "terminal"
+                             :key  "P"
+                             :action  (fn [] (vim.fn.jobstart "gh pr list --web" { :detach  true }))
+                             :height  5
+                             :padding  2
+                             :enabled (not= nil (Snacks.git.get_root))
+                           }
+                           (fn [] 
+                                   (let [
+                                         is_git (not= nil (Snacks.git.get_root))
+                                         cmds [
+                                               ; {
+                                               ;   :title  "Open Issues"
+                                               ;   :cmd  "gh issue list -L 3"
+                                               ;   :key  "i"
+                                               ;   :action  (fn [] (vim.fn.jobstart "gh issue list --web" { :detach  true }))
+                                               ;   :icon  " "
+                                               ;   :height  7
+                                               ; }
+                                                 {
+                                                   :icon  " "
+                                                   :title  "Git Status"
+                                                   :cmd  "git --no-pager diff --stat -B -M -C"
+                                                   :height  9
+                                                 }
+                                      ]]
+                                     (vim.tbl_map (fn [cmd]
+                                                    (vim.tbl_extend "force" {
+                                                                    :pane 2
+                                                                    :section "terminal"
+                                                                    :enabled is_git
+                                                                    :padding 1
+                                                                    :ttl (* 5 60)
+                                                                    ; :indent 3
+                                                                    } cmd)) cmds)))
+                ]
+              }
+              :image {}
+              :scope {}
 
-  :statuscolumn
-  {:left ["mark" "sign"] ; priority of signs on the left (high to low)
-   :right ["fold" "git"] ; priority of signs on the right (high to low)
-   :folds {:open true ; show open fold icons
-           :git_hl true} ; use Git Signs hl for fold icons
-   :git {:patterns ["GitSign" "MiniDiffSign"]}
-   :refresh 50} ; refresh at most every 50ms
+              :statuscolumn
+              {:left ["mark" "sign"] ; priority of signs on the left (high to low)
+              :right ["fold" "git"] ; priority of signs on the right (high to low)
+              :folds {:open true ; show open fold icons
+              :git_hl true} ; use Git Signs hl for fold icons
+              :git {:patterns ["GitSign" "MiniDiffSign"]}
+              :refresh 50} ; refresh at most every 50ms
 
-  :picker
-  {:layout {:preset "ivy"}
-   :matcher {:fuzzy true
-             :frecency true}
-   ; :ui_select true
-   :debug {:scores true}
+              :picker
+              {:layout {:preset "ivy"}
+              :matcher {:fuzzy true
+              :frecency true}
+              ; :ui_select true
+              :debug {:scores true}
 
-   :layouts
-   {:telescope
-    {:reverse false
-     :layout
-     {:box "horizontal"
-      :backdrop false
-      :width 0.8
-      :height 0.9
-      :border "none"
-      {:box "vertical"
-       {:win "list" :title " Results " :title_pos "center" :border "rounded"}
-       {:win "input" :height 1 :border "rounded" :title "{title} {live} {flags}" :title_pos "center"}}
-      {:win "preview"
-       :title "{preview:Preview}"
-       :width 0.45
-       :border "rounded"
-       :title_pos "center"}}}
+              :layouts
+                {:telescope
+                    {:reverse false
+                     :layout
+                    {:box "horizontal"
+              :backdrop false
+              :width 0.8
+              :height 0.9
+              :border "none"
+              {:box "vertical"
+              {:win "list" :title " Results " :title_pos "center" :border "rounded"}
+              {:win "input" :height 1 :border "rounded" :title "{title} {live} {flags}" :title_pos "center"}}
+              {:win "preview"
+              :title "{preview:Preview}"
+              :width 0.45
+              :border "rounded"
+              :title_pos "center"}}}
 
-    :default
-    {:layout
-     {:backdrop false
-      :row 1
-      :width 0.8
-      :min_width 80
-      :height 0.8
-      :border "rounded"
-      :box "horizontal"
-      {:box "vertical"
-       :border "rounded"
-       :title "{title} {live} {flags}"
-       :title_pos "center"
-       {:win "list" :border "bottom"}
-       {:win "input" :height 1 :border "top"}}
-      {:win "preview" :title "{preview}" :width 0.4 :border "rounded"}}}
+              :default
+              {:layout
+              {:backdrop false
+              :row 1
+              :width 0.8
+              :min_width 80
+              :height 0.8
+              :border "rounded"
+              :box "horizontal"
+              {:box "vertical"
+              :border "rounded"
+              :title "{title} {live} {flags}"
+              :title_pos "center"
+              {:win "list" :border "bottom"}
+              {:win "input" :height 1 :border "top"}}
+              {:win "preview" :title "{preview}" :width 0.4 :border "rounded"}}}
 
-    :ivy
-    {:layout
-     {:box "vertical"
-      :backdrop false
-      :row -1
-      :width 0
-      :height 0.7
-      :border "top"
-      :title " {title} {live} {flags}"
-      :title_pos "left"
-      {:win "input" :height 1 :border "bottom"}
-      {:box "horizontal"
-       {:win "list" :border "none"}
-       {:win "preview" :title "{preview}" :width 0.5 :border "none"}}}}
+              :ivy
+              {:layout
+              {:box "vertical"
+              :backdrop false
+              :row -1
+              :width 0
+              :height 0.7
+              :border "top"
+              :title " {title} {live} {flags}"
+              :title_pos "left"
+              {:win "input" :height 1 :border "bottom"}
+              {:box "horizontal"
+              {:win "list" :border "none"}
+              {:win "preview" :title "{preview}" :width 0.5 :border "none"}}}}
 
-    :vscode
-    {:preview "main"
-     :layout
-     {:backdrop false
-      :row 1
-      :width 0.4
-      :min_width 80
-      :height 0.4
-      :border "none"
-      {:win "input" :height 1 :border "rounded" :title "{title} {live} {flags}" :title_pos "center"}
-      {:box "vertical"
-        {:win "list" :border "hpad"}
-        {:win "preview" :title "{preview}" :height 0.9 :border "rounded"}}}}
+              :vscode
+              {:preview "main"
+              :layout
+              {:backdrop false
+              :row 1
+              :width 0.4
+              :min_width 80
+              :height 0.4
+              :border "none"
+              {:win "input" :height 1 :border "rounded" :title "{title} {live} {flags}" :title_pos "center"}
+              {:box "vertical"
+              {:win "list" :border "hpad"}
+              {:win "preview" :title "{preview}" :height 0.9 :border "rounded"}}}}
 
-   :sources
-   {:explorer
-    {:finder "explorer"
-     :sort {:fields ["sort"]}
-     :tree true
-     :supports_live true
-     :follow_file true
-     :auto_close true
-     :jump {:close false}
-     ; :layout {:preset "ivy" :preview false}
-     }}}}})
+              :sources
+              {:explorer
+              {:finder "explorer"
+              :sort {:fields ["sort"]}
+              :tree true
+              :supports_live true
+              :follow_file true
+              :auto_close true
+              :jump {:close false}
+              ; :layout {:preset "ivy" :preview false}
+              }}}}})
 
 (map!
   :mode "n"
   :key "+"
   :command (fn []
-    (Snacks.picker.explorer))
+             (Snacks.picker.explorer))
   :options {:desc "Open Snacks explorer (Directory of Current File)"})
 
 (map!
   :mode "n"
   :key "gO"
   :command (fn []
-    (Snacks.picker.lsp_symbols))
+             (Snacks.picker.lsp_symbols))
   :options {:desc "Open Snacks lsp symbols"})
 
 (map!
   :mode "n"
   :key "gS"
   :command (fn []
-    (Snacks.picker.lsp_workspace_symbols))
+             (Snacks.picker.lsp_workspace_symbols))
   :options {:desc "Open Snacks lsp workspace symbols"})
 
 (map!
   :mode "n"
   :key "<leader>sP"
   :command (fn []
-    (Snacks.picker))
+             (Snacks.picker))
   :options {:desc "Open Snack picker"})
 
 (map!
@@ -226,6 +317,18 @@
 
 (map!
   :mode "n"
+  :key "<leader>gb"
+  :command (fn [] (Snacks.git.blame_line))
+  :options {:desc "Git blame"})
+
+(map!
+  :mode "n"
+  :key "<leader>gB"
+  :command (fn [] (Snacks.gitbrowse))
+  :options {:desc "Git Browse"})
+
+(map!
+  :mode "n"
   :key "<leader>gS"
   :command (fn [] (Snacks.picker.git_stash))
   :options {:desc "Git Stash"})
@@ -249,11 +352,11 @@
   :command (fn [] (Snacks.picker.grep))
   :options {:desc "Grep (Root Dir)"})
 
-(map!
-  :mode "n"
-  :key "<leader>sP"
-  :command (fn [] (Snacks.picker.lazy))
-  :options {:desc "Search for Plugin Spec"})
+; (map!
+;   :mode "n"
+;   :key "<leader>sP"
+;   :command (fn [] (Snacks.picker.lazy))
+;   :options {:desc "Search for Plugin Spec"})
 
 (map!
   :mode ["n" "x"]
@@ -379,10 +482,31 @@
 
 (map!
   :mode "n"
+  :key "<leader>tS"
+  :command (fn [] (Snacks.terminal))
+  :options {:desc "Snacks terminal"})
+
+(map!
+  :mode "n"
+  :key "<leader>ts"
+  :command (fn [] (_G.get_terminal_list))
+  :options {:desc "Snacks terminal list"})
+
+(map!
+  :mode "n"
+  :key "<leader>tf"
+  :command (fn [] 
+            (vim.ui.input {:prompt "Command: "} (fn [input]
+              (if (and (not= "" input) (not= nil input))
+                  (Snacks.terminal.toggle input)))))
+  :options {:desc "Snacks terminal"})
+
+(map!
+  :mode "n"
   :key "<C-x>4<C-o>"
   :command (fn []
-                (vim.cmd.vsplit)
-                (Snacks.picker.buffers))
+             (vim.cmd.vsplit)
+             (Snacks.picker.buffers))
   :options {:desc "Open buffer in split"})
 
 (map!

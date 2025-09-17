@@ -13,13 +13,21 @@
   boot.loader.systemd-boot.enable = lib.mkForce false;
   #boot.loader.systemd-boot.secureBoot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelModules = ["uinput"];
+  boot.kernelModules = ["uinput" "kvm-intel"];
   boot.lanzaboote = {
           enable = true;
           pkiBundle = "/var/lib/sbctl";
   };
   
   hardware.uinput.enable = true;
+  hardware.opengl.enable = true;
+  hardware.opengl.extraPackages = with pkgs; [
+    vpl-gpu-rt
+    libvdpau-va-gl
+    intel-media-driver
+    intel-compute-runtime
+  ];
+  hardware.opengl.driSupport32Bit = true;
 
   systemd.services.kanata-internalKeyboard.serviceConfig = {
 	  SupplementaryGroups = [
@@ -111,7 +119,7 @@
   users.users.ezechukwu69 = {
     isNormalUser = true;
     description = "Ezechukwu Ojukwu";
-    extraGroups = [ "networkmanager" "wheel" "uinput" "input" "video" "docker" ];
+    extraGroups = [ "networkmanager" "kvm" "wheel" "uinput" "input" "video" "docker" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
     #  thunderbird
@@ -122,18 +130,23 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  programs.localsend = {
+    enable = true;
+    openFirewall = true;
+  };
  
   programs.zsh.enable = true;
 
   programs.hyprland = {
- 	enable = true;
-	xwayland = {
-		enable = true;
-	};
+    enable = true;
+      xwayland = {
+        enable = true;
+      };
   };
 
   programs.hyprlock = {
-	enable = true;
+    enable = true;
   };
 
 
@@ -150,8 +163,19 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     curl
+    pkg-config
+    xdg-desktop-portal-gnome
+    qt6.full
+    bash
+    gnome-keyring
+    clang
+    dunst
+    cmake
+    ninja
+    gtk3
     wget
     kanata
+    rustdesk
     matugen
     docker-compose
     glibc
@@ -159,6 +183,9 @@
     sbctl
     hyprcursor
     hyprshot
+    mesa
+    xwayland-satellite
+    vulkan-tools
     wl-clipboard
     protobuf
     xkeyboard-config
@@ -179,6 +206,13 @@
     ffmpeg
     xorg.libXext
     xorg.libX11
+    qemu_kvm
+    tofi
+    libvirt
+    virt-manager
+    glib
+    zlib
+    ncurses
 # android studio
     alsa-lib
     dbus
@@ -216,6 +250,17 @@
   virtualisation.docker = {
 	  enable = true;
   };
+
+
+  virtualisation.libvirtd = {
+	  enable = true;
+  };
+
+  programs.niri = {
+    enable = true;
+  };
+
+  programs.dconf.enable = true;
 
   programs.nix-ld.enable = true;
 
@@ -259,15 +304,37 @@
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  # networking.firewall.allowedTCPPorts = [ 53317 ];
+  # networking.firewall.allowedUDPPorts = [ 53317 ];
+  # networking.firewall.allowedUDPPortRanges = [
+  #     { from = 53316; to = 53318; }
+  #   ];
+  #
+  #   # Enable multicast
+  # networking.firewall.extraCommands = ''
+  #     iptables -A nixos-fw -p udp --dport 53317 -j ACCEPT
+  #     iptables -A nixos-fw -p udp -m multicast --dst-type MULTICAST -j ACCEPT
+  #   '';
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    nssmdns6 = true;
+    openFirewall = true;
+    publish = {
+      enable = true;
+      addresses = true;
+      workstation = true;
+      userServices = true;
+    };
+  };
+
+# This value determines the NixOS release from which the default
+# settings for stateful data, like file locations and database versions
+# on your system were taken. It‘s perfectly fine and recommended to leave
+# this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?

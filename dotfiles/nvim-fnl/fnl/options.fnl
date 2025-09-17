@@ -10,7 +10,7 @@
 (set o.relativenumber true)
 
 (set o.cursorline  false)
-(set o.numberwidth  4)   ;; minimal number of columns to use for the
+(set o.numberwidth  8)   ;; minimal number of columns to use for the
 (set o.scrolloff  10)     ;; scrolloff
 (set o.sidescrolloff  10) ;; sidescrolloff
 (set o.wrap  false)      ;; disable line wrapping
@@ -48,7 +48,7 @@
 (opt.diffopt:append "linematch:60")
 (set o.redrawtime  10000)
 (set o.maxmempattern  20000)
-(set o.showtabline  1)
+; (set o.showtabline  2)
 (set o.tabline  "")
 
 ;; File handling

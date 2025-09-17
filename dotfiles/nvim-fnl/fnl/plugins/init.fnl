@@ -1,4 +1,5 @@
 (require :plugins.colorschemes)
+(require "plugins/snacks")
 (vim.pack.add [
    "https://github.com/stevearc/dressing.nvim" 
    "https://github.com/nvim-lua/plenary.nvim" 
@@ -10,14 +11,15 @@
     }
 ])
 (require "plugins/mini")
-(require "plugins/snacks")
 (require "plugins/which-key")
-(require "plugins/lualine")
+; (require "plugins/lualine")
 (require "plugins/markdown")
 (require "plugins/dap")
 (require "plugins/hunk")
 (require "plugins/edgy-custom")
 (require "plugins/flutter-tools")
 (require "plugins/carenvim")
-(require "plugins/breadcrumb")
+; (require "plugins/breadcrumb")
 (require "plugins/supermaven")
+(require "plugins/quickfix")
+(require "plugins/flash")

@@ -39,6 +39,9 @@
                    {
                       :title "Quickfix List"
                       :ft  :qf
+                      :size {
+                        :height 0.5
+                      }
                    }
                    {
                       :title "Location List"
@@ -49,4 +52,30 @@
                       :ft  :help
                    }
           ]
+        :right [
+
+                   {
+                      :title "Avante"
+                      :ft  :Avante
+                      :size {
+                        :width 70
+                      }
+                   }
+                   {
+                      :title "AvanteSelectedFiles"
+                      :ft  :AvanteSelectedFiles
+                      :size {
+                        :width 70
+                        :height 3
+                      }
+                   }
+                   {
+                      :title "AvanteInput"
+                      :ft  :AvanteInput
+                      :size {
+                        :width 70
+                        :height 8
+                      }
+                   }
+        ]
 })

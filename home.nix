@@ -1,7 +1,10 @@
 { inputs, config, lib, pkgs, customPkgs, ... }:
 
 {
-  imports = [inputs.zen-browser.homeModules.twilight];
+  imports = [
+    inputs.zen-browser.homeModules.twilight
+    inputs.vicinae.homeManagerModules.default
+  ];
   home.username = "ezechukwu69";
   home.homeDirectory = "/home/ezechukwu69";
 
@@ -14,11 +17,38 @@
   xdg.configFile."hyprpanel".source = ./dotfiles/hyprpanel;
   xdg.configFile."nvim".source = ./dotfiles/nvim-fnl;
   xdg.configFile."jj".source = ./dotfiles/jj;
-#home.file.".emacs.d".source = ./dotfiles/emacs;
+  xdg.configFile."waybar-niri".source = ./dotfiles/waybar-niri;
+  xdg.configFile."niri".source = ./dotfiles/niri;
+  xdg.configFile."tmux".source = ./dotfiles/tmux;
+  home.file.".doom.d".source = ./dotfiles/doom; 
+
+  services.vicinae = {
+    enable = true; # default: false
+      autoStart = true; # default: true
+      settings = {
+        faviconService = "google";
+        font = {
+          normal = "Aporetic Sans Mono";
+          size = 11;
+        };
+        popToRootOnClose = true;
+        theme = {
+          iconTheme = "Adwaita";
+          name = "dracula";
+        };
+        window = {
+          csd = true;
+          opacity = 0.95;
+          rounding = 10;
+        };
+      };
+  };
 
 
   home.sessionVariables = {
     XKB_CONFIG_ROOT="${pkgs.xkeyboard-config}/share/X11/xkb";
+    # JAVA_HOME = "${pkgs.android-studio}/android-studio/jbr";
+    # ANDROID_HOME = "${pkgs.android-studio}/share/android-sdk";
     LD_LIBRARY_PATH = "${
       with pkgs;
       lib.makeLibraryPath [ 
@@ -64,8 +94,15 @@
   };
 
   home.packages = with pkgs; [
+      # inputs.noctalia.packages."x86_64-linux".default
+      # inputs.quickshell.packages."x86_64-linux".default
       btop
       ripgrep
+      mise
+      gnumake
+      gnupg
+      sqlite
+      wordnet
       vivaldi
       tree
       rofi
@@ -87,32 +124,43 @@
       prisma
       firebase-tools
       nerd-fonts.jetbrains-mono
-      android-studio
+      # android-studio
       networkmanagerapplet
       jetbrains-toolbox
-      flutter
+      # flutter
       blueman
       nodejs_24
       sherlock-launcher
       aporetic
       gh
+      gh-notify
+      gh-dash
       waypaper
       swww
       ghostty
       helix
       zed-editor
-      jdk23
+      jdk
       php
+      tmux
 # language servers
+      emacs-lsp-booster
       lua-language-server
+      fennel-ls
       typescript-language-server
       vtsls
       phpactor
 #end
+#treesitter
+      tree-sitter
+      tree-sitter-grammars.tree-sitter-dart
+#end
       teamviewer
-      ] ++ (with customPkgs; [
-          vicinaeBin
-      ]);
+      ];
+
+ # ++ (with customPkgs; [
+ #          vicinaeBin
+ #      ])
 
   dconf.enable = true;
 
@@ -139,6 +187,9 @@
     userEmail = "ezechukwu69@gmail.com";
 
     extraConfig = {
+      github = {
+        user = "ezechukwu69";
+      };
       credential = {
         helper = "store";
       };
@@ -216,15 +267,18 @@
       zstyle ':completion:*' menu select interactive
       setopt AUTO_MENU
       setopt MENU_COMPLETE
-      export ANDROID_HOME="~/Android/Sdk"
+      # export ANDROID_HOME="~/Android/Sdk"
       export PATH="$HOME/Android/Sdk/platform-tools/:$PATH"
       export PATH="$HOME/.cargo/bin/:$PATH"
+      export PATH="$HOME/installations/flutter/bin/:$PATH"
       export PATH="$PATH":"$HOME/.pub-cache/bin"
       export PATH="$PATH":"$HOME/.npm-global/bin"
       export PATH="$HOME/.local/bin":"$PATH"
+      export PATH="$HOME/.emacs.d/bin":"$PATH"
       export PRISMA_QUERY_ENGINE_LIBRARY=${pkgs.prisma-engines}/lib/libquery_engine.node
       export PRISMA_QUERY_ENGINE_BINARY=${pkgs.prisma-engines}/bin/query-engine
       export PRISMA_SCHEMA_ENGINE_BINARY=${pkgs.prisma-engines}/bin/schema-engine
+      source ~/.zshrc_local
       . ~/.local/share/bob/env/env.sh
     '';
 

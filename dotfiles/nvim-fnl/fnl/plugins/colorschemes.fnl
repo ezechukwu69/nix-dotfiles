@@ -8,6 +8,9 @@
     "https://github.com/folke/tokyonight.nvim"
     "https://github.com/vague2k/vague.nvim"
     "https://github.com/ellisonleao/gruvbox.nvim"
+    "https://github.com/scottmckendry/cyberdream.nvim"
+    "https://github.com/tiagovla/tokyodark.nvim"
+    "https://github.com/bluz71/vim-moonfly-colors"
 ])
 
 ((. (require "vague") :setup)
@@ -61,4 +64,4 @@
 (require :tokyonight)
 (require :jellybeans)
 (require :monoglow)
-(vim.cmd.colorscheme :gruvbox)
+(vim.cmd.colorscheme :moonfly)

@@ -1,7 +1,7 @@
 _G.nvim_start_time = vim.loop.hrtime()
 vim.pack.add({
   "https://github.com/nvim-tree/nvim-web-devicons",
-  "https://github.com/nvimdev/dashboard-nvim",
+  -- "https://github.com/nvimdev/dashboard-nvim",
   "https://github.com/rktjmp/hotpot.nvim",
   "https://github.com/udayvir-singh/hibiscus.nvim",
   {
@@ -12,6 +12,9 @@ vim.pack.add({
   "https://github.com/nvim-treesitter/playground",
   "https://github.com/nvim-treesitter/nvim-treesitter-context"
 })
+
+
+vim.cmd [[packadd cfilter]]
 
 require 'nvim-treesitter.configs'.setup {
   modules = {},
@@ -150,7 +153,7 @@ require("hotpot").setup({
   enable_hotpot_diagnostics = true
 })
 
-require("custom-dashboard")
+-- require("custom-dashboard")
 require("options")
 require("mappings")
 require("lsp")
@@ -164,14 +167,23 @@ set path+=,**
 local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })
 local string = vim.api.nvim_get_hl(0, { name = "String" })
 
-vim.api.nvim_set_hl(0, "Normal", { bg = "none", fg = normal.fg })
-vim.api.nvim_set_hl(0, "StatusLine", { bg = "none", fg = normal.fg })
-vim.api.nvim_set_hl(0, "WinBar", { bg = "none", fg = normal.fg })
-vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "none", fg = normal.fg })
-vim.api.nvim_set_hl(0, "WinBarNC", { bg = "none", fg = normal.fg })
-vim.api.nvim_set_hl(0, "LineNrAbove", { bg = "none", bold = false, fg = normal.fg })
-vim.api.nvim_set_hl(0, "LineNr", { bg = "none", bold = true, fg = string.fg })
-vim.api.nvim_set_hl(0, "LineNrBelow", { bg = "none", bold = false, fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "Normal", { bg = "none", fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "NormalNC", { link = "Normal" })
+-- vim.api.nvim_set_hl(0, "EdgyNormal", { link = "Normal" })
+-- vim.api.nvim_set_hl(0, "EdgyWinBar", { bg = "none", fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "EdgyIcon", { bg = "none", fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "EdgyIconActive", { bg = "none", fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "EdgyTitle", { bg = "none", fg = normal.fg })
+-- vim.api.nvim_set_hl(0, "EdgyWinBarNC", { bg = "none", fg = normal.fg })
+vim.api.nvim_set_hl(0, "StatusLine", { link = "Normal" })
+vim.api.nvim_set_hl(0, "FoldColumn", { link = "Normal" })
+vim.api.nvim_set_hl(0, "WinBar", { link = "Normal" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { link = "Normal" })
+vim.api.nvim_set_hl(0, "WinBarNC", { link = "Normal" })
+vim.api.nvim_set_hl(0, "LineNrAbove", { link = "Normal" })
+vim.api.nvim_set_hl(0, "LineNr", { link = "String", bold = true })
+vim.api.nvim_set_hl(0, "Folded", { link = "LineNr" })
+vim.api.nvim_set_hl(0, "LineNrBelow", { link = "Normal" })
 
 
 vim.api.nvim_set_hl(0, "lualine_b_normal", { bg = "none" })
@@ -182,3 +194,39 @@ vim.api.nvim_set_hl(0, "lualine_z_normal", { bg = "none" })
 
 -- Do the same for inactive mode if needed:
 vim.api.nvim_set_hl(0, "lualine_c_inactive", { bg = "none" })
+
+
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "snacks_dashboard" }, -- replace with your filetypes
+--   callback = function()
+--     local o = vim.o
+--     o.winborder = "none"
+--   end,
+-- })
+--
+_G.get_terminal_list = function()
+  local list = Snacks.terminal.list()
+  local gotten_list = vim.tbl_map(function(item)
+    return { buf = item.buf, cmd = item.cmd }
+  end, list)
+  if #gotten_list == 0 then
+    return
+  end
+  vim.ui.select(gotten_list, {
+    prompt = "Select terminal",
+    format_item = function(item)
+      return item.cmd .. " " .. "(" .. item.buf .. ")"
+    end,
+  }, function(item)
+    if not item then
+      return
+    end
+    Snacks.terminal.toggle(item.cmd)
+  end)
+end
+
+-- Extra plugins from lua/
+require("plugins.avante")
+require("plugins.heirline")
+
+-- Snacks.terminal.toggle("zsh")
