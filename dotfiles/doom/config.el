@@ -212,3 +212,10 @@
   (add-hook 'typescript-ts-mode-hook 'eglot-ensure))
 
 (setq epg-pinentry-mode 'loopback)
+
+(map!
+ :nvi "C-e" #'end-of-line
+ :nvi "C-a" #'beginning-of-line
+ :nvi (kbd "C-SPC") #'set-mark-command)
+
+(completion-preview-mode 1)
