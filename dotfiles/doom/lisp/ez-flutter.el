@@ -58,7 +58,7 @@
 
 (defun ez/reload-on-save ()
   "Run after Apheleia finishes formatting in Dart mode."
-  (when (derived-mode-p 'dart-mode)
+  (when (or (derived-mode-p 'dart-mode) (derived-mode-p 'dart-ts-mode))
     ;; Replace with your actual command
     (ez/flutter-reload)))
 
