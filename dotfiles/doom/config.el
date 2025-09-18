@@ -156,10 +156,24 @@
                       (let ((modes (if (listp (car entry)) (car entry) (list (car entry)))))
                         (seq-some (lambda (mode)
                                     (let ((mode-name (if (listp mode) (car mode) mode)))
-                                      (memq mode-name '(js-mode js-ts-mode tsx-mode tsx-ts-mode
-                                                        typescript-mode typescript-ts-mode))))
+                                      (memq mode-name '(
+                                                        js-mode
+                                                        js-ts-mode
+                                                        tsx-mode
+                                                        tsx-ts-mode
+                                                        ;; ruby-ts-mode
+                                                        ;; ruby-mode
+                                                        typescript-mode
+                                                        typescript-ts-mode))))
                                   modes)))
                     eglot-server-programs))
+
+
+  ;; (add-to-list 'eglot-server-programs
+  ;;              '(((ruby-mode :language-id "ruby")
+  ;;                 (ruby-ts-mode :language-id "ruby")
+  ;;                 ))
+  ;;              "ruby-lsp")
 
   (add-to-list 'eglot-server-programs
                '(((js-mode :language-id "javascript")

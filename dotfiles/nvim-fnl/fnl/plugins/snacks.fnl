@@ -51,7 +51,7 @@
                            ; }
                            {
                              :title  "Notifications"
-                             :cmd  "gh-notify -s -n5"
+                             :cmd  "gh notify -s -n5"
                              :section "terminal"
                              :action  (fn [] (vim.ui.open "https://github.com/notifications"))
                              :key  "n"
