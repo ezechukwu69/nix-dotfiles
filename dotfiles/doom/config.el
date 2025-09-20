@@ -102,6 +102,16 @@
   (add-to-list 'copilot-indentation-alist '(closure-mode 2))
   (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
 
+(use-package! eldoc-box
+  :bind (:map prog-mode-map
+              ("C-c u" . eldoc-box-scroll-down)
+              ("C-c d" . eldoc-box-scroll-up)
+              ("M-h" . eldoc-box-help-at-point))
+  :config
+  ;; (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode t)
+  ;; (add-hook 'prog-mode-hook #'eldoc-box-hover-mode t)
+  (add-hook 'eldoc-box-buffer-setup-hook #'eldoc-box-prettify-ts-errors 0 t))
+
 (use-package! buffer-box)
 
 (use-package! spacious-padding
@@ -145,8 +155,7 @@
   (custom-set-faces!
     '(aw-leading-char-face
       :foreground "white" :background "red"
-      :weight bold :height 2.2 :box (:line-width 3 :color "red")))
-  )
+      :weight bold :height 2.2 :box (:line-width 3 :color "red"))))
 
 
 (after! eglot

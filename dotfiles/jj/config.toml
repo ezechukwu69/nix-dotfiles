@@ -6,7 +6,6 @@ name = "ezechukwu69"
 program = "meld"      # Defaults to the name of the tool if not specified
 edit-args = ["--newtab", "$left", "$right"]
 
-
 [merge-tools.ediff]
 program = "emacs"      # Defaults to the name of the tool if not specified
 edit-args = ["--eval", "(ediff-directories \"$left\" \"$right\" \".*\")"]

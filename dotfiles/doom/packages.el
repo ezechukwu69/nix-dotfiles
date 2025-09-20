@@ -20,6 +20,7 @@
 (package! buffer-box
   :recipe (:host github :repo "rougier/buffer-box"))
 
+(package! eldoc-box)
 (package! spacious-padding)
 
 ;; If the package you are trying to install does not contain a PACKAGENAME.el
