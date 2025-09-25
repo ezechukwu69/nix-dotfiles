@@ -9,6 +9,7 @@
                  :cssls
                  :clangd
                  :neocmake
+                 :vue_ls
 ])
 
 (vim.diagnostic.config {:signs {:text {(. vim.diagnostic.severity :ERROR) " "

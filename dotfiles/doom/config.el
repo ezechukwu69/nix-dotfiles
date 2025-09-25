@@ -32,7 +32,8 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-challenger-deep)
+
+(setq doom-theme 'doom-monokai-classic)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -114,22 +115,52 @@
 
 (use-package! buffer-box)
 
+(use-package! vue-mode
+  :mode ("\\.vue\\'" . vue-mode)
+  :config
+  (setq vue-html-tab-width 2)
+  (setq vue-html-extra-indent 0)
+  (setq vue-html-color-interpolations t))
+
+(use-package! web-mode)
+(use-package! emmet-mode
+  :hook ((vue-mode . emmet-mode)))
+
+;; (use-package! nano-modeline
+;;   :config
+;;   (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+;;   (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+;;   (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+;;   (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+;;   (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+;;   (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+;;   (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+;;   (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+;;   (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+;;   (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+;;   (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+;;   (nano-modeline-text-mode 1))
+
 (use-package! spacious-padding
   :if (display-graphic-p)
   :config
   (setq spacious-padding-widths
-        '( :internal-border-width 15
-           :header-line-width 4
-           :mode-line-width 8
-           :tab-width 4
-           :right-divider-width 30
-           :scroll-bar-width 8
-           ;; :fringe-width 8
-           ))
+        '(
+          :internal-border-width 2
+          ;;:header-line-width 4
+          :mode-line-width 5
+          :tab-width 2
+          :right-divider-width 10
+          ;;:scroll-bar-width 8
+          ;;:fringe-width 1
+          ))
 
   (setq spacious-padding-subtle-frame-lines
         `( :mode-line-active "#FFFFFF"
-           :mode-line-inactive vertical-border))
+           ;;:mode-line-inactive vertical-border))
+           :mode-line-inactive "#808080"))
 
   (spacious-padding-mode 1)
 
@@ -176,6 +207,36 @@
                                                         typescript-ts-mode))))
                                   modes)))
                     eglot-server-programs))
+
+  (setq-default eglot-workspace-configuration
+                '(:typescript
+                  (:preferences
+                   (:includePackageJsonAutoImports "on")
+                   :plugins
+                   [(:name "@vue/typescript-plugin"
+                     :location "global"
+                     :languages ["vue"])])))
+
+  (add-hook 'vue-mode-hook 'eglot-ensure)
+
+  (defun my-eglot-vue-init-options ()
+    "Return initialization options for vtsls with Vue support."
+    `(:typescript
+      (:preferences
+       (:includePackageJsonAutoImports "on")
+       :plugins
+       [(:name "@vue/typescript-plugin"
+         :location "global"
+         :languages ["vue"])])))
+
+  ;; Apply configuration when Eglot connects
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'vue-mode)
+                (eglot-signal-didChangeConfiguration
+                 eglot--connection
+                 (my-eglot-vue-init-options)))))
+
 
 
   ;; (add-to-list 'eglot-server-programs
@@ -242,3 +303,33 @@
  :nvi (kbd "C-SPC") #'set-mark-command)
 
 (completion-preview-mode 1)
+(global-set-key (kbd "C-x _") 'maximize-window)
+(map!
+ :after corfu
+ :map corfu-map
+ "C-n" #'corfu-next
+ "C-p" #'corfu-previous)
+
+;; (global-set-key emacs-lisp-mode (kbd "C-x _") 'maximize-window)
+
+(after! org
+  (setq org-M-RET-may-split-line '((default . nil)))
+  (setq org-insert-heading-respect-content t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-todo-keywords '(
+                            (sequence "TODO(t!)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w!)" "HOLD(h!)" "IDEA(i!)"
+                                      "|" "DONE(d!)" "KILL(k!)")
+                            (sequence "[ ](T!)" "[-](S!)" "[?](W!)" "|" "[X](D!)")
+                            (sequence "|" "OKAY(o)" "YES(y)" "NO(n)"))))
+
+(repeat-mode 1)
+(when (getenv "WAYLAND_DISPLAY")
+  (setq interprogram-cut-function
+        (lambda (text)
+          (with-temp-buffer
+            (insert text)
+            (call-process-region (point-min) (point-max) "wl-copy" nil nil nil "-f" "-n"))))
+  (setq interprogram-paste-function
+        (lambda ()
+          (shell-command-to-string "wl-paste -n | tr -d '\\r'"))))

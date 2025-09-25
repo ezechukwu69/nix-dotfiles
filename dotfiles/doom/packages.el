@@ -20,6 +20,11 @@
 (package! buffer-box
   :recipe (:host github :repo "rougier/buffer-box"))
 
+(package! vue-mode)
+(package! web-mode)
+(package! emmet-mode)
+(package! nano-modeline)
+
 (package! eldoc-box)
 (package! spacious-padding)
 
