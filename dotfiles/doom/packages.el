@@ -20,8 +20,9 @@
 (package! buffer-box
   :recipe (:host github :repo "rougier/buffer-box"))
 
-(package! vue-mode)
-(package! web-mode)
+(package! vue-ts-mode
+  :recipe (:host github :repo "8uff3r/vue-ts-mode"))
+
 (package! emmet-mode)
 (package! nano-modeline)
 

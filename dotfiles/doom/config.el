@@ -33,7 +33,7 @@
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 
-(setq doom-theme 'doom-monokai-classic)
+(setq doom-theme 'doom-gruvbox)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -78,14 +78,14 @@
 ;;
 ;; accept completion from copilot and fallback to company
 ;;
-(map!
- :nv "g r a" #'eglot-code-actions
- :nv "g r n" #'eglot-rename
- :nv "g r r" #'xref-find-references
- :nv "g r i" #'eglot-find-implementation
- :nv "g r t" #'eglot-find-typeDefinition
- :nv "g r D" #'eglot-show-call-hierarchy
- :nv "g r T" #'eglot-show-type-hierarchy)
+;; (map!
+;;  :nv "g r a" #'eglot-code-actions
+;;  :nv "g r n" #'eglot-rename
+;;  :nv "g r r" #'xref-find-references
+;;  :nv "g r i" #'eglot-find-implementation
+;;  :nv "g r t" #'eglot-find-typeDefinition
+;;  :nv "g r D" #'eglot-show-call-hierarchy
+;;  :nv "g r T" #'eglot-show-type-hierarchy)
 
 (setq consult-imenu-config
       '((prog-mode :toplevel "Class" "Function" "Method" "Interface" "Struct" "Enum" "Type" "Component" "Trait" "Impl" "Module")))
@@ -122,7 +122,7 @@
   (setq vue-html-extra-indent 0)
   (setq vue-html-color-interpolations t))
 
-(use-package! web-mode)
+;; (use-package! web-mode)
 (use-package! emmet-mode
   :hook ((vue-mode . emmet-mode)))
 
@@ -142,6 +142,10 @@
 ;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
 ;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
 ;;   (nano-modeline-text-mode 1))
+(use-package! vue-ts-mode
+  :mode ("\\.vue\\'" . vue-ts-mode))
+
+;; make sure you're using one of the vue-ts-mode or web-mode and change the `vue-ts-mode` to something else
 
 (use-package! spacious-padding
   :if (display-graphic-p)
@@ -208,36 +212,7 @@
                                   modes)))
                     eglot-server-programs))
 
-  (setq-default eglot-workspace-configuration
-                '(:typescript
-                  (:preferences
-                   (:includePackageJsonAutoImports "on")
-                   :plugins
-                   [(:name "@vue/typescript-plugin"
-                     :location "global"
-                     :languages ["vue"])])))
-
   (add-hook 'vue-mode-hook 'eglot-ensure)
-
-  (defun my-eglot-vue-init-options ()
-    "Return initialization options for vtsls with Vue support."
-    `(:typescript
-      (:preferences
-       (:includePackageJsonAutoImports "on")
-       :plugins
-       [(:name "@vue/typescript-plugin"
-         :location "global"
-         :languages ["vue"])])))
-
-  ;; Apply configuration when Eglot connects
-  (add-hook 'eglot-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'vue-mode)
-                (eglot-signal-didChangeConfiguration
-                 eglot--connection
-                 (my-eglot-vue-init-options)))))
-
-
 
   ;; (add-to-list 'eglot-server-programs
   ;;              '(((ruby-mode :language-id "ruby")
@@ -248,10 +223,12 @@
   (add-to-list 'eglot-server-programs
                '(((js-mode :language-id "javascript")
                   (js-ts-mode :language-id "javascript")
+                  (vue-ts-mode :language-id "vue")
                   (tsx-ts-mode :language-id "typescriptreact")
                   (typescript-ts-mode :language-id "typescript")
                   (typescript-mode :language-id "typescript"))
                  "vtsls" "--stdio"))
+
   ;; Your workspace configuration (place this after the server configuration)
   (setq-default eglot-workspace-configuration
                 '((vtsls
