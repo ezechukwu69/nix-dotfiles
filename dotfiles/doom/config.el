@@ -107,6 +107,8 @@
   :bind (:map prog-mode-map
               ("C-c u" . eldoc-box-scroll-down)
               ("C-c d" . eldoc-box-scroll-up)
+              ("C-c C-u" . eldoc-box-scroll-down)
+              ("C-c C-d" . eldoc-box-scroll-up)
               ("M-h" . eldoc-box-help-at-point))
   :config
   ;; (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-mode t)
@@ -174,16 +176,15 @@
 (add-load-path! "lisp")
 (require 'ez-flutter)
 
-(after! 'dart-ts-mode
-  (lambda ()
-    ;; Your tree-sitter Dart setup code here
-    (setq treesit-language-source-alist
-          (assq-delete-all 'dart treesit-language-source-alist))
+;; Your tree-sitter Dart setup code here
+(after! treesit 
+  (setq treesit-language-source-alist
+        (assq-delete-all 'dart treesit-language-source-alist))
 
-    (setq treesit-language-source-alist
-          (append treesit-language-source-alist
-                  '((dart "https://github.com/UserNobody14/tree-sitter-dart"))))
-    ))
+  (setq treesit-language-source-alist
+        (append treesit-language-source-alist
+                '((dart "https://github.com/UserNobody14/tree-sitter-dart"))))
+  )
 
 (after! ace-window
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
@@ -212,7 +213,7 @@
                                   modes)))
                     eglot-server-programs))
 
-  (add-hook 'vue-mode-hook 'eglot-ensure)
+  (add-hook 'vue-ts-mode-hook 'lsp)
 
   ;; (add-to-list 'eglot-server-programs
   ;;              '(((ruby-mode :language-id "ruby")
@@ -223,7 +224,7 @@
   (add-to-list 'eglot-server-programs
                '(((js-mode :language-id "javascript")
                   (js-ts-mode :language-id "javascript")
-                  (vue-ts-mode :language-id "vue")
+                                        ; (vue-ts-mode :language-id "vue")
                   (tsx-ts-mode :language-id "typescriptreact")
                   (typescript-ts-mode :language-id "typescript")
                   (typescript-mode :language-id "typescript"))
@@ -265,6 +266,15 @@
                                                      (insertSpaceBeforeAndAfterBinaryOperators . t)
                                                      (insertSpaceAfterKeywordsInControlFlowStatements . t))))))))
                 )
+
+  (add-to-list 'eglot-server-programs
+               `(vue-ts-mode . ("lspx" "--lsp" "vue-language-server --stdio" "--lsp" "vtsls --stdio" :initializationOptions `(:vtsls
+                                                                                                                              (:tsserver
+                                                                                                                               (:globalPlugins (:name "@vue/typescript-plugin"
+                                                                                                                                                :location (string-trim-right (shell-command-to-string "npm list -g --parseable @vue/language-server | head -n1"))
+                                                                                                                                                :languages ("vue")
+                                                                                                                                                :configNamespace "typescript")))))))
+  
   (add-hook 'js-mode-hook 'eglot-ensure)
   (add-hook 'js-ts-mode-hook 'eglot-ensure)
   (add-hook 'tsx-mode-hook 'eglot-ensure)
@@ -310,3 +320,5 @@
   (setq interprogram-paste-function
         (lambda ()
           (shell-command-to-string "wl-paste -n | tr -d '\\r'"))))
+
+(setq lsp-disabled-clients '(rubocop-ls))
