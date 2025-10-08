@@ -322,3 +322,32 @@
           (shell-command-to-string "wl-paste -n | tr -d '\\r'"))))
 
 (setq lsp-disabled-clients '(rubocop-ls))
+(after! corfu
+  (setq corfu-preselect 'first)
+  (map! :map corfu-map
+        "<escape>" #'corfu-quit)
+  )
+
+(defun mark-line ()
+  "Mark the current line."
+  (interactive)
+  (beginning-of-line)
+  (set-mark (point))
+  (end-of-line))
+
+(defun mark-line-rev ()
+  "Mark the current line. in reverse"
+  (interactive)
+  (end-of-line)
+  (set-mark (point))
+  (beginning-of-line))
+
+(map!
+ :desc "Mark line"
+ "M-o" #'mark-line
+ "M-O" #'mark-line-rev)
+
+(map!
+ :map evil-normal-state-map
+ "U" #'evil-redo
+ "C-r" #'isearch-backward)

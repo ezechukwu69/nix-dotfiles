@@ -65,3 +65,6 @@
 ;;
 (unpin! lsp-mode)
 (package! lsp-mode)
+
+(package! jj-mode
+  :recipe (:host github :repo "bolivier/jj-mode.el"))
